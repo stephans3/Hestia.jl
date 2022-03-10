@@ -15,11 +15,11 @@ makedocs(;
     ),
     pages=[
        "Home" => "index.md",
-  	"Components" => "components.md",
+  	    "Components" => "components.md",
     ],
 )
 
 deploydocs(;
     repo="github.com/stephans3/Hestia.jl",
-    devbranch="main",
+    # devbranch="main",
 )
