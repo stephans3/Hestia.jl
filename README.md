@@ -1,5 +1,7 @@
 # Hestia
 
+Simulation of heat conduction problems in multiple dimensions with boundary control.
+
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://stephans3.github.io/Hestia.jl/stable)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://stephans3.github.io/Hestia.jl/dev)
 [![Build Status](https://github.com/stephans3/Hestia.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/stephans3/Hestia.jl/actions/workflows/CI.yml?query=branch%3Amain)
