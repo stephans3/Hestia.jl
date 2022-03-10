@@ -1,0 +1,13 @@
+name = "Hestia"
+uuid = "75036a29-a2ca-4eb4-a964-4c35e636f9a9"
+authors = ["Stephan Scholz <stephan.scholz@rwu.de> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1.6"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
