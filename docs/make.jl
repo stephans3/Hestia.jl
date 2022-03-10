@@ -20,6 +20,5 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/stephans3/Hestia.jl",
-    # devbranch="main",
+    repo="github.com/stephans3/Hestia.jl.git",
 )
