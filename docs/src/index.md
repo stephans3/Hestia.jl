@@ -9,6 +9,10 @@ Documentation for [Hestia](https://github.com/stephans3/Hestia.jl).
 ```@index
 ```
 
-```@autodocs
-Modules = [Hestia]
+## Components
+
+```@contents
+Pages = ["components.md",]
+Depth = 1
 ```
+

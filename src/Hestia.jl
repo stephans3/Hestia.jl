@@ -1,5 +1,52 @@
+# Author: Stephan Scholz
+# Year 2022
+
 module Hestia
 
-# Write your package code here.
+using Base: Tuple, Integer
 
-end
+
+# Core utilities
+export StaticIsoProperty, DynamicIsoProperty
+export createStaticIsoProperty, createDynamicIsoProperty, getdiffusivity
+include("core/properties.jl")
+
+export AbstractSegmentation, SimpleSegment, MixedSegment, HyperSegment
+export createSimpleSegment
+include("core/segmentation.jl")
+
+export HeatRod, HeatPlate, HeatCuboid
+export getHeatCells, getindices
+export getnumofboundarycells, getboundarypositions, getpositionofindex, getindexofposition # Only for testing
+include("core/geometry.jl")
+
+
+export Emission
+export createEmission, emit!, emit
+include("core/emission.jl")
+
+
+export HeatRodBoundary, HeatPlateBoundary, HeatCuboidBoundary
+export initBoundary, setEmission!, getEmission
+include("core/boundary.jl")
+
+
+#### Interface #####
+export RadialConfiguration
+export initConfiguration, setConfiguration, characterize
+include("interface/characterization.jl")
+
+export induce!
+export HeatRodActuation, HeatPlateActuation, HeatCuboidActuation
+export initActuation, getActuation, setActuation!, checkActuation2D
+include("interface/actuators.jl")
+
+# Core
+export CubicHeatProblem
+export diffusion!
+include("core/heatproblem.jl")
+
+
+
+
+end # module
