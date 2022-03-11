@@ -1,4 +1,4 @@
-# Hestia
+# Hestia.jl
 
 Simulation of heat conduction problems in multiple dimensions with boundary control.
 
