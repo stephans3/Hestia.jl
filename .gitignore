@@ -10,4 +10,4 @@ Manifest.toml
 
 # PDF output - usually a bad idea to keep this in Git
 *.pdf
-.github/workflows/CI.yml
+
