@@ -25,8 +25,6 @@ Ntotal = Nx*Ny*Nz
 
 property = createStaticIsoProperty(λ, ρ, c)
 cuboid   = HeatCuboid(L, W, H, Nx, Ny, Nz, property)
-pos = getpositionofindex(cuboid, 357)
-
 
 ### Boundaries ###
 θamb = 300.0;
@@ -50,7 +48,8 @@ num_actuators = (4,3)        # Number of actuators
 pos_actuators = :underside   # Position of actuators
 num_act_total = num_actuators[1]*num_actuators[2]
 
-cuboid_actuation = initActuation(cuboid)
+# cuboid_actuation = initActuation(cuboid)
+cuboid_actuation = initIOSetup(cuboid)
 
 # Create actuator characterization
 scale     = 1.0;
@@ -59,7 +58,9 @@ curvature = 100.0;
 
 config  = setConfiguration(scale, power, curvature)
 
-setActuation!(cuboid_actuation, cuboid, num_actuators, config,  pos_actuators)
+# setActuation!(cuboid_actuation, cuboid, num_actuators, config,  pos_actuators)
+setIOSetup!(cuboid_actuation, cuboid, num_actuators, config,  pos_actuators)
+
 
 function heat_conduction!(dθ, θ, param, t)
     property  = heatproblem.geometry.segmentation.heatProperty;
@@ -91,8 +92,8 @@ import LinearAlgebra
 import OrdinaryDiffEq
 
 prob = OrdinaryDiffEq.ODEProblem(heat_conduction!,θinit,tspan)
-sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.Euler(), dt=Δt, saveat=1.0)
-
+# sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.Euler(), dt=Δt, saveat=1.0)
+sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.KenCarp5(), saveat=1.0)
 
 using Plots
 heatmap(reshape(sol[end], Nx, Ny,Nz)[:,:,1])

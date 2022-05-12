@@ -17,7 +17,7 @@ include("core/segmentation.jl")
 
 export HeatRod, HeatPlate, HeatCuboid
 export getHeatCells, getindices
-export getnumofboundarycells, getboundarypositions, getpositionofindex, getindexofposition # Only for testing
+#export getnumofboundarycells, getboundarypositions, getpositionofindex, getindexofposition # Only for testing
 include("core/geometry.jl")
 
 
@@ -36,7 +36,13 @@ export RadialConfiguration
 export initConfiguration, setConfiguration, characterize
 include("interface/characterization.jl")
 
-export induce!
+export IOSetup
+export initIOSetup, setIOSetup!, getActuation, getSensing, measureWAM
+export checkIOSetup2D
+include("interface/iosetup.jl")
+
+# 
+#export induce!
 export HeatRodActuation, HeatPlateActuation, HeatCuboidActuation
 export initActuation, getActuation, setActuation!, checkActuation2D
 include("interface/actuators.jl")

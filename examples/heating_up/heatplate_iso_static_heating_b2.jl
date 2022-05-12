@@ -48,7 +48,8 @@ num_actuators2  = 7        # Number of actuators
 pos_actuators1 = :south   # Position of actuators
 pos_actuators2 = :north    # Position of actuators
 
-plate_actuation = initActuation(plate)
+# plate_actuation = initActuation(plate)
+plate_actuation = initIOSetup(plate)
 
 # Create actuator characterization
 scale     = 1.0;
@@ -80,8 +81,12 @@ partition2[3] = 0
 partition2[5] = 0
 
 
-setActuation!(plate_actuation, plate, partition1, config_table1,  pos_actuators1)
-setActuation!(plate_actuation, plate, partition2, config_table2,  pos_actuators2)
+# setActuation!(plate_actuation, plate, partition1, config_table1,  pos_actuators1)
+# setActuation!(plate_actuation, plate, partition2, config_table2,  pos_actuators2)
+
+setIOSetup!(plate_actuation, plate, partition1, config_table1,  pos_actuators1)
+setIOSetup!(plate_actuation, plate, partition2, config_table2,  pos_actuators2)
+
 
 # Uncontrolled / free system
 function heat_conduction!(dθ, θ, param, t)
@@ -104,7 +109,9 @@ import LinearAlgebra
 import OrdinaryDiffEq
 
 prob = OrdinaryDiffEq.ODEProblem(heat_conduction!,θinit,tspan)
-sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.Euler(), dt=Δt, saveat=1.0)
+# sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.Euler(), dt=Δt, saveat=1.0)
+sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.KenCarp5(), saveat=1.0)
+
 
 using Plots
 heatmap(reshape(sol[end], Nx, Ny))

@@ -46,7 +46,10 @@ const heatproblem = CubicHeatProblem(plate, boundary_plate)
 num_actuators = 5        # Number of actuators
 pos_actuators = :south   # Position of actuators
 
-plate_actuation = initActuation(plate)
+# plate_actuation = initActuation(plate)
+plate_actuation = initIOSetup(plate)
+
+
 
 # Create actuator characterization
 scale     = 1.0;
@@ -55,7 +58,9 @@ curvature = 100.0;
 
 config  = setConfiguration(scale, power, curvature)
 
-setActuation!(plate_actuation, plate, num_actuators, config,  pos_actuators)
+# setActuation!(plate_actuation, plate, num_actuators, config,  pos_actuators)
+setIOSetup!(plate_actuation, plate, num_actuators, config,  pos_actuators)
+
 
 function heat_conduction!(dθ, θ, param, t)
     property  = heatproblem.geometry.segmentation.heatProperty;
@@ -76,7 +81,8 @@ import LinearAlgebra
 import OrdinaryDiffEq
 
 prob = OrdinaryDiffEq.ODEProblem(heat_conduction!,θinit,tspan)
-sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.Euler(), dt=Δt, saveat=1.0)
+# sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.Euler(), dt=Δt, saveat=1.0)
+sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.KenCarp5(), saveat=1.0)
 
 using Plots
 heatmap(reshape(sol[end], Nx, Ny))

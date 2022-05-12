@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="210pt" height="210pt" viewBox="0 0 210 210" version="1.1">
+<defs>
+<radialGradient id="radial0" gradientUnits="userSpaceOnUse" cx="-50" cy="-50" fx="-50" fy="-50" r="50" gradientTransform="matrix(1,0,0,1,105,105)">
+<stop offset="0.1" style="stop-color:rgb(22%,59.6%,14.9%);stop-opacity:1;"/>
+<stop offset="1" style="stop-color:rgb(100%,100%,100%);stop-opacity:1;"/>
+</radialGradient>
+<radialGradient id="radial1" gradientUnits="userSpaceOnUse" cx="50" cy="-50" fx="50" fy="-50" r="50" gradientTransform="matrix(1,0,0,1,105,105)">
+<stop offset="0.1" style="stop-color:rgb(58.4%,34.5%,69.8%);stop-opacity:1;"/>
+<stop offset="1" style="stop-color:rgb(100%,100%,100%);stop-opacity:1;"/>
+</radialGradient>
+<radialGradient id="radial2" gradientUnits="userSpaceOnUse" cx="-50" cy="50" fx="-50" fy="50" r="50" gradientTransform="matrix(1,0,0,1,105,105)">
+<stop offset="0.1" style="stop-color:rgb(79.6%,23.5%,20%);stop-opacity:1;"/>
+<stop offset="1" style="stop-color:rgb(100%,100%,100%);stop-opacity:1;"/>
+</radialGradient>
+<radialGradient id="radial3" gradientUnits="userSpaceOnUse" cx="50" cy="50" fx="50" fy="50" r="50" gradientTransform="matrix(1,0,0,1,105,105)">
+<stop offset="0.1" style="stop-color:rgb(25.1%,38.8%,84.7%);stop-opacity:1;"/>
+<stop offset="1" style="stop-color:rgb(100%,100%,100%);stop-opacity:1;"/>
+</radialGradient>
+</defs>
+<g id="surface1708">
+<rect x="0" y="0" width="210" height="210" style="fill:rgb(100%,100%,100%);fill-opacity:1;stroke:none;"/>
+<path style=" stroke:none;fill-rule:nonzero;fill:url(#radial0);" d="M 5 105 L 5 5 L 105 5 L 105 105 Z M 5 105 "/>
+<path style=" stroke:none;fill-rule:nonzero;fill:url(#radial1);" d="M 105 105 L 105 5 L 205 5 L 205 105 Z M 105 105 "/>
+<path style=" stroke:none;fill-rule:nonzero;fill:url(#radial2);" d="M 5 205 L 5 105 L 105 105 L 105 205 Z M 5 205 "/>
+<path style=" stroke:none;fill-rule:nonzero;fill:url(#radial3);" d="M 105 205 L 105 105 L 205 105 L 205 205 Z M 105 205 "/>
+<path style="fill:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 105 205 L 45 205 C 22.910156 205 5 187.089844 5 165 L 5 45 C 5 22.910156 22.910156 5 45 5 L 165 5 C 187.089844 5 205 22.910156 205 45 L 205 165 C 205 187.089844 187.089844 205 165 205 Z M 105 205 "/>
+</g>
+</svg>
