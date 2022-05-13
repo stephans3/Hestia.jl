@@ -1,7 +1,7 @@
 name = "Hestia"
 uuid = "75036a29-a2ca-4eb4-a964-4c35e636f9a9"
 authors = ["Stephan Scholz <stephan.scholz@rwu.de> and contributors"]
-version = "0.1.0"
+version = "0.2.0"
 
 [compat]
 julia = "1.6"
