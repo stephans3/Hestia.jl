@@ -33,14 +33,10 @@ boundary_west = :west
 boundary_east = :east 
 boundary_north = :north  
 
-
 boundary_plate = initBoundary(plate)
 setEmission!(boundary_plate, emission_robin, boundary_west)
 setEmission!(boundary_plate, emission_robin, boundary_east)
 setEmission!(boundary_plate, emission_robin, boundary_north)
-
-const heatproblem = CubicHeatProblem(plate, boundary_plate)
-
 
 ### Actuation ###
 num_actuators = 5        # Number of actuators
@@ -48,7 +44,6 @@ pos_actuators = :south   # Position of actuators
 
 # plate_actuation = initActuation(plate)
 plate_actuation = initIOSetup(plate)
-
 
 
 # Create actuator characterization
@@ -63,12 +58,9 @@ setIOSetup!(plate_actuation, plate, num_actuators, config,  pos_actuators)
 
 
 function heat_conduction!(dθ, θ, param, t)
-    property  = heatproblem.geometry.segmentation.heatProperty;
-    boundary  = heatproblem.boundary
-
     u_in = 4e5 * ones(num_actuators)    # heat input
 
-    diffusion!(dθ, θ, heatproblem.geometry, property, boundary, plate_actuation, u_in)
+    diffusion!(dθ, θ, plate, property, boundary_plate, plate_actuation, u_in)
 end
 
 θinit = θ₀*ones(Ntotal)

@@ -39,9 +39,6 @@ setEmission!(boundary_plate, emission_nonlinear, boundary_west)
 setEmission!(boundary_plate, emission_nonlinear, boundary_east)
 setEmission!(boundary_plate, emission_nonlinear, boundary_north)
 
-const heatproblem = CubicHeatProblem(plate, boundary_plate)
-
-
 ### Actuation ###
 num_actuators = 5        # Number of actuators per boundary
 pos_actuators1 = :south  # Position of actuators
@@ -65,12 +62,9 @@ setIOSetup!(plate_actuation, plate, num_actuators, config,  pos_actuators2, star
 
 
 function heat_conduction!(dθ, θ, param, t)
-    property  = heatproblem.geometry.segmentation.heatProperty;
-    boundary  = heatproblem.boundary
-
     u_in = 4e5 * ones(2*num_actuators)    # heat input
 
-    diffusion!(dθ, θ, heatproblem.geometry, property, boundary, plate_actuation, u_in)
+    diffusion!(dθ, θ, plate, property, boundary_plate, plate_actuation, u_in)
 end
 
 # Initial conditions of ODE

@@ -4,12 +4,58 @@
 
 #############################################################
 
+
+
 abstract type  AbstractBoundary end
 abstract type  AbstractCubicBoundary <: AbstractBoundary end
 
+# Change boundaries as in iosetup.jl: Array -> Dict
+
+mutable struct CubicBoundary <: AbstractBoundary
+    indices :: Dict{Symbol, Vector{Int64}}       # Cell indices
+    emissions :: Dict{Symbol, Vector{Emission}}  # Emission: heat transfer + heat radiation
+end
+
+function initBoundary(geometry :: AbstractGeometricalObject)
+    
+    position_symbols = getboundarypositions( geometry )
+    
+    indices = Dict{Symbol, Vector{Int64}}()
+    emissions = Dict{Symbol, Vector{Emission}}()
+
+    for pos in position_symbols
+        indices[pos] = getindices(geometry, cellPosition=pos)
+
+        N = length(indices[pos])
+        zeroEmission = createEmission(0, 0, 0)
+        emissions[pos] = Vector{Emission}(undef,N)
+        fill!(emissions[pos], zeroEmission)
+    end
+
+    return CubicBoundary(indices,emissions)
+end
+
+function setEmission!(boundary :: CubicBoundary, emission :: Emission, orientation :: Symbol)
+
+    N = length(boundary.emissions[orientation])
+    emission_array = Array{Emission}(undef,N)
+    fill!(emission_array, emission)
+
+    boundary.emissions[orientation] = emission_array;
+
+    return nothing
+end
+
+function getEmission(boundary :: CubicBoundary, cellindex :: Integer, orientation :: Symbol)
+
+    emission_index = findfirst(isequal(cellindex), boundary.indices[orientation])
+    emission = (boundary.emissions[orientation])[emission_index]
+
+    return emission
+end
 
 
-
+# The following lines will be removed in future
 mutable struct HeatRodBoundary <: AbstractCubicBoundary
     indices_west :: Array{Integer,1}    # Contains 1 element
     indices_east :: Array{Integer,1}
@@ -47,7 +93,8 @@ mutable struct HeatCuboidBoundary <: AbstractCubicBoundary
     emissions_topside :: Array{Emission,1}
 end
 
-function initBoundary(geometry :: AbstractGeometricalObject)
+# Deprecated
+function initBoundary_OLD(geometry :: AbstractGeometricalObject)
     
 
     if isa( geometry, HeatRod )
@@ -118,7 +165,8 @@ function initBoundary(geometry :: AbstractGeometricalObject)
 
 end
 
-function setEmission!(boundary :: AbstractCubicBoundary, emission :: Emission, orientation :: Symbol)
+# Deprecated
+function setEmission!_OLD(boundary :: AbstractCubicBoundary, emission :: Emission, orientation :: Symbol)
     if orientation == :west
         emission_array = Array{Emission}(undef,length(boundary.emissions_west))
         fill!(emission_array, emission)
@@ -159,8 +207,8 @@ function setEmission!(boundary :: AbstractCubicBoundary, emission :: Emission, o
     return nothing
 end
 
-
-function getEmission(boundary :: AbstractCubicBoundary, cellindex :: Integer, orientation :: Symbol)
+# Deprecated
+function getEmission_OLD(boundary :: AbstractCubicBoundary, cellindex :: Integer, orientation :: Symbol)
 
     if orientation == :west
         emission_index = findfirst(isequal(cellindex), boundary.indices_west)

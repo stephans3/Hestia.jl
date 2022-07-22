@@ -26,8 +26,6 @@ Ntotal = Nx*Ny*Nz
 
 property  = createStaticIsoProperty(λ, ρ, c)
 cuboid    = HeatCuboid(L, W, H, Nx, Ny, Nz, property)
-pos = getpositionofindex(cuboid, 357)
-
 
 ### Boundaries ###
 θamb = 300.0;
@@ -44,14 +42,8 @@ setEmission!(boundary_cuboid, emission_nonlinear, boundary_east)
 setEmission!(boundary_cuboid, emission_nonlinear, boundary_north)
 setEmission!(boundary_cuboid, emission_nonlinear, boundary_topside)
 
-const heatproblem = CubicHeatProblem(cuboid, boundary_cuboid)
-
-
-function heat_conduction!(dθ, θ, param, t)
-    property  = heatproblem.geometry.segmentation.heatProperty;
-    boundary  = heatproblem.boundary
-
-    diffusion!(dθ, θ, heatproblem.geometry, property, boundary)
+function heat_conduction!(dθ, θ, param, t)  
+    diffusion!(dθ, θ, cuboid, property, boundary_cuboid)
 end
 
 # Initial conditions of ODE

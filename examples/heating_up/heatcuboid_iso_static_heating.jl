@@ -41,8 +41,6 @@ setEmission!(boundary_cuboid, emission_nonlinear, boundary_east)
 setEmission!(boundary_cuboid, emission_nonlinear, boundary_north)
 setEmission!(boundary_cuboid, emission_nonlinear, boundary_topside)
 
-const heatproblem = CubicHeatProblem(cuboid, boundary_cuboid)
-
 ### Actuation ###
 num_actuators = (4,3)        # Number of actuators
 pos_actuators = :underside   # Position of actuators
@@ -63,13 +61,9 @@ setIOSetup!(cuboid_actuation, cuboid, num_actuators, config,  pos_actuators)
 
 
 function heat_conduction!(dθ, θ, param, t)
-    property  = heatproblem.geometry.segmentation.heatProperty;
-    boundary  = heatproblem.boundary
-
-
     u_in = 4e5 * ones(num_act_total)
 
-    diffusion!(dθ, θ, heatproblem.geometry, property, boundary, cuboid_actuation, u_in)
+    diffusion!(dθ, θ, cuboid, property, boundary_cuboid, cuboid_actuation, u_in)
 end
 
 # Initial conditions of ODE

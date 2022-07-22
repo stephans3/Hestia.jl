@@ -2,15 +2,15 @@ abstract type AbstractHeatProblem end
 
 struct CubicHeatProblem <:AbstractHeatProblem
     geometry    :: AbstractCubicObject
-    boundary    :: AbstractCubicBoundary
+    boundary    :: CubicBoundary
 end
 
 
-function diffusion!(dθ :: AbstractArray{T}, 
-                    θ :: AbstractArray{T},  
+function diffusion!(dθ :: AbstractArray{T1}, 
+                    θ :: AbstractArray{T2},  
                     heatrod :: HeatRod, 
                     property :: StaticIsoProperty, 
-                    boundary :: AbstractCubicBoundary) where T <: Real
+                    boundary :: CubicBoundary) where {T1 <: Real, T2 <: Real}
     λ = property.λ # Thermal conductivity
     c = property.c # capacity
     ρ = property.ρ # density
@@ -23,11 +23,11 @@ end
 
 
 
-function diffusion!(dθ :: AbstractArray{T}, 
-                    θ :: AbstractArray{T},  
+function diffusion!(dθ :: AbstractArray{T1}, 
+                    θ :: AbstractArray{T2},  
                     heatplate :: HeatPlate, 
                     property :: StaticIsoProperty, 
-                    boundary :: AbstractCubicBoundary ) where T <: Real
+                    boundary :: CubicBoundary ) where {T1 <: Real, T2 <: Real}
     λ = property.λ # Thermal conductivity
     c = property.c # capacity
     ρ = property.ρ # density    
@@ -39,7 +39,11 @@ function diffusion!(dθ :: AbstractArray{T},
     diffusion_static_y!(dθ, θ, Nx, Ny, 1, Δy, λ, c, ρ, boundary)
 end
 
-function diffusion!(dθ :: AbstractArray{T}, θ :: AbstractArray{T},  heatcuboid :: HeatCuboid, property :: StaticIsoProperty, boundary :: AbstractCubicBoundary ) where T <: Real
+function diffusion!(dθ :: AbstractArray{T1}, 
+                    θ :: AbstractArray{T2},  
+                    heatcuboid :: HeatCuboid, 
+                    property :: StaticIsoProperty, 
+                    boundary :: CubicBoundary ) where {T1 <: Real, T2 <: Real}
     λ = property.λ # Thermal conductivity
     c = property.c # capacity
     ρ = property.ρ # density    
@@ -54,7 +58,7 @@ end
 
 
 
-function diffusion_static_x!(dx,x,Nx, Ny, Nz, Δx, λ :: Real, c :: Real, ρ :: Real, boundary :: AbstractCubicBoundary) # in-place 
+function diffusion_static_x!(dx,x,Nx, Ny, Nz, Δx, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary) # in-place 
     α = λ/(c*ρ) # Diffusivity
 
     for iz in 1:Nz      
@@ -78,7 +82,7 @@ function diffusion_static_x!(dx,x,Nx, Ny, Nz, Δx, λ :: Real, c :: Real, ρ :: 
 end
 
 
-function diffusion_static_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Real, c :: Real, ρ :: Real, boundary :: AbstractCubicBoundary) # in-place
+function diffusion_static_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary) # in-place
     α = λ/(c*ρ)
     
     for iz in 1:Nz
@@ -103,7 +107,7 @@ function diffusion_static_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Real, c :: Real, ρ :: 
     nothing 
 end
 
-function diffusion_static_z!(dx,x,Nx, Ny, Nz, Δz, λ :: Real, c :: Real, ρ :: Real, boundary :: AbstractCubicBoundary) # in-place
+function diffusion_static_z!(dx,x,Nx, Ny, Nz, Δz, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary) # in-place
     α = λ/(c*ρ)
     
     
@@ -135,7 +139,11 @@ end
 
 
 
-function diffusion!(dθ :: AbstractArray{T}, θ :: AbstractArray{T},  heatrod :: HeatRod, property :: DynamicIsoProperty, boundary :: AbstractCubicBoundary ) where T <: Real
+function diffusion!(dθ :: AbstractArray{T1}, 
+                    θ :: AbstractArray{T2},  
+                    heatrod :: HeatRod, 
+                    property :: DynamicIsoProperty, 
+                    boundary :: CubicBoundary ) where {T1 <: Real, T2 <: Real}
     
     λ(x) = specifyproperty(x, property.λ) # thermal conductivity
     c(x) = specifyproperty(x, property.c) # specific heat capacity
@@ -148,7 +156,11 @@ function diffusion!(dθ :: AbstractArray{T}, θ :: AbstractArray{T},  heatrod ::
 end
 
 
-function diffusion!(dθ :: AbstractArray{T}, θ :: AbstractArray{T},  heatplate :: HeatPlate, property :: DynamicIsoProperty, boundary :: AbstractCubicBoundary ) where T <: Real
+function diffusion!(dθ :: AbstractArray{T1}, 
+                    θ :: AbstractArray{T2},  
+                    heatplate :: HeatPlate, 
+                    property :: DynamicIsoProperty, 
+                    boundary :: CubicBoundary ) where {T1 <: Real, T2 <: Real}
    
     λ(x) = specifyproperty(x, property.λ) # thermal conductivity
     c(x) = specifyproperty(x, property.c) # specific heat capacity
@@ -161,7 +173,11 @@ function diffusion!(dθ :: AbstractArray{T}, θ :: AbstractArray{T},  heatplate 
     diffusion_dynamic_y!(dθ, θ, Nx, Ny, 1, Δy, λ, c, ρ, boundary)
 end
 
-function diffusion!(dθ :: AbstractArray{T}, θ :: AbstractArray{T},  heatcuboid :: HeatCuboid, property :: DynamicIsoProperty, boundary :: AbstractCubicBoundary ) where T <: Real
+function diffusion!(dθ :: AbstractArray{T1}, 
+                    θ :: AbstractArray{T2},  
+                    heatcuboid :: HeatCuboid, 
+                    property :: DynamicIsoProperty, 
+                    boundary :: CubicBoundary ) where {T1 <: Real, T2 <: Real}
    
     λ(x) = specifyproperty(x, property.λ) # thermal conductivity
     c(x) = specifyproperty(x, property.c) # specific heat capacity
@@ -175,7 +191,8 @@ function diffusion!(dθ :: AbstractArray{T}, θ :: AbstractArray{T},  heatcuboid
     diffusion_dynamic_z!(dθ, θ, Nx, Ny, Nz, Δz, λ, c, ρ, boundary)
 end
 
-function diffusion_dynamic_x!(dx,x,Nx, Ny, Nz, Δx, λ :: Function, c :: Function, ρ :: Function, boundary :: AbstractCubicBoundary ) # in-place
+
+function diffusion_dynamic_x!(dx,x,Nx, Ny, Nz, Δx, λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary ) # in-place
     
     for iz in 1:Nz
         for iy in 1 : Ny
@@ -207,7 +224,7 @@ end
 
 
 
-function diffusion_dynamic_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Function, c :: Function, ρ :: Function, boundary :: AbstractCubicBoundary ) # in-place
+function diffusion_dynamic_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary ) # in-place
     for iz in 1:Nz
         for ix in 1 : Nx
             for  iy in 2 : Ny-1
@@ -240,7 +257,7 @@ end
 
 
 
-function diffusion_dynamic_z!(dx,x,Nx, Ny, Nz, Δz,  λ :: Function, c :: Function, ρ :: Function, boundary :: AbstractCubicBoundary) # in-place
+function diffusion_dynamic_z!(dx,x,Nx, Ny, Nz, Δz,  λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary) # in-place
     
     for ix in 1 : Nx
         for  iy in 1 : Ny
@@ -271,13 +288,13 @@ end
 
 
 
-function diffusion!(dθ :: AbstractArray{T}, 
-                    θ :: AbstractArray{T},  
+function diffusion!(dθ :: AbstractArray{T1}, 
+                    θ :: AbstractArray{T2},  
                     heatrod :: HeatRod, 
                     property :: StaticIsoProperty, 
-                    boundary :: AbstractCubicBoundary,  
+                    boundary :: CubicBoundary,  
                     actuation :: AbstractIOSetup, 
-                    input_signals :: Vector{T2} ) where {T <: Real, T2 <: Real}
+                    input_signals :: AbstractArray{T3} ) where {T1 <: Real, T2 <: Real, T3 <: Real}
 
     λ = property.λ # Thermal conductivity
     c = property.c # capacity
@@ -291,13 +308,13 @@ end
 
 
 
-function diffusion!(dθ :: AbstractArray{T}, 
-                        θ :: AbstractArray{T},  
+function diffusion!(dθ :: AbstractArray{T1}, 
+                        θ :: AbstractArray{T2},  
                         heatplate :: HeatPlate, 
                         property :: StaticIsoProperty, 
-                        boundary :: AbstractCubicBoundary,  
+                        boundary :: CubicBoundary,  
                         actuation :: AbstractIOSetup, 
-                        input_signals :: Vector{T2} ) where {T <: Real, T2 <: Real}
+                        input_signals :: AbstractArray{T3} ) where {T1 <: Real, T2 <: Real, T3 <: Real}
 
     λ = property.λ # Thermal conductivity
     c = property.c # capacity
@@ -310,13 +327,13 @@ function diffusion!(dθ :: AbstractArray{T},
     diffusion_static_y!(dθ, θ, Nx, Ny, 1, Δy, λ, c, ρ, boundary, actuation, input_signals)
 end
 
-function diffusion!(dθ :: AbstractArray{T}, 
-                        θ :: AbstractArray{T},  
+function diffusion!(dθ :: AbstractArray{T1}, 
+                        θ :: AbstractArray{T2},  
                         heatcuboid :: HeatCuboid, 
                         property :: StaticIsoProperty, 
-                        boundary :: AbstractCubicBoundary,
+                        boundary :: CubicBoundary,
                         actuation :: AbstractIOSetup, 
-                        input_signals :: Vector{T2} ) where {T <: Real, T2 <: Real}
+                        input_signals :: AbstractArray{T3} ) where {T1 <: Real, T2 <: Real, T3 <: Real}
     λ = property.λ # Thermal conductivity
     c = property.c # capacity
     ρ = property.ρ # density    
@@ -333,7 +350,7 @@ end
 
 
 
-function diffusion_static_x!(dx, x, Nx, Ny, Nz, Δx, λ :: Real, c :: Real, ρ :: Real, boundary :: AbstractCubicBoundary, actuation :: AbstractIOSetup, input_signals :: Vector{T}) where T <: Real  # in-place 
+function diffusion_static_x!(dx, x, Nx, Ny, Nz, Δx, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real  # in-place 
     α = λ/(c*ρ) # Diffusivity
 
     for iz in 1:Nz
@@ -364,7 +381,7 @@ end
 
 
 
-function diffusion_static_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Real, c :: Real, ρ :: Real, boundary :: AbstractCubicBoundary, actuation :: AbstractIOSetup, input_signals :: Vector{T}) where T <: Real # in-place
+function diffusion_static_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real # in-place
     α = λ/(c*ρ)
     
     for iz in 1:Nz
@@ -395,7 +412,7 @@ function diffusion_static_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Real, c :: Real, ρ :: 
     nothing 
 end
 
-function diffusion_static_z!(dx,x,Nx, Ny, Nz, Δz, λ :: Real, c :: Real, ρ :: Real, boundary :: AbstractCubicBoundary, actuation :: AbstractIOSetup, input_signals :: Vector{T}) where T <: Real # in-place
+function diffusion_static_z!(dx,x,Nx, Ny, Nz, Δz, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real # in-place
     α = λ/(c*ρ)
     
     
@@ -434,13 +451,13 @@ end
 
 
 
-function diffusion!(dθ :: AbstractArray{T}, 
-                    θ :: AbstractArray{T},  
+function diffusion!(dθ :: AbstractArray{T1}, 
+                    θ :: AbstractArray{T2},  
                     heatrod :: HeatRod, 
                     property :: DynamicIsoProperty, 
-                    boundary :: AbstractCubicBoundary ,  
+                    boundary :: CubicBoundary ,  
                     actuation :: AbstractIOSetup, 
-                    input_signals :: Vector{T2} ) where {T <: Real, T2 <: Real}
+                    input_signals :: AbstractArray{T3} ) where {T1 <: Real, T2 <: Real, T3 <: Real}
     
     λ(x) = specifyproperty(x, property.λ) # thermal conductivity
     c(x) = specifyproperty(x, property.c) # specific heat capacity
@@ -453,13 +470,13 @@ function diffusion!(dθ :: AbstractArray{T},
 end
 
 
-function diffusion!(dθ :: AbstractArray{T}, 
-                    θ :: AbstractArray{T},  
+function diffusion!(dθ :: AbstractArray{T1}, 
+                    θ :: AbstractArray{T2},  
                     heatplate :: HeatPlate, 
                     property :: DynamicIsoProperty, 
-                    boundary :: AbstractCubicBoundary,
+                    boundary :: CubicBoundary,
                     actuation :: AbstractIOSetup, 
-                    input_signals :: Vector{T2} ) where {T <: Real, T2 <: Real}
+                    input_signals :: AbstractArray{T3} ) where {T1 <: Real, T2 <: Real, T3 <: Real}
    
     λ(x) = specifyproperty(x, property.λ) # thermal conductivity
     c(x) = specifyproperty(x, property.c) # specific heat capacity
@@ -472,13 +489,13 @@ function diffusion!(dθ :: AbstractArray{T},
     diffusion_dynamic_y!(dθ, θ, Nx, Ny, 1, Δy, λ, c, ρ, boundary, actuation, input_signals)
 end
 
-function diffusion!(dθ :: AbstractArray{T}, 
-                    θ :: AbstractArray{T},  
+function diffusion!(dθ :: AbstractArray{T1}, 
+                    θ :: AbstractArray{T2},  
                     heatcuboid :: HeatCuboid, 
                     property :: DynamicIsoProperty, 
-                    boundary :: AbstractCubicBoundary,
+                    boundary :: CubicBoundary,
                     actuation :: AbstractIOSetup, 
-                    input_signals :: Vector{T2} ) where {T <: Real, T2 <: Real}
+                    input_signals :: AbstractArray{T3} ) where {T1 <: Real, T2 <: Real, T3 <: Real}
    
     λ(x) = specifyproperty(x, property.λ) # thermal conductivity
     c(x) = specifyproperty(x, property.c) # specific heat capacity
@@ -492,7 +509,7 @@ function diffusion!(dθ :: AbstractArray{T},
     diffusion_dynamic_z!(dθ, θ, Nx, Ny, Nz, Δz, λ, c, ρ, boundary, actuation, input_signals)
 end
 
-function diffusion_dynamic_x!(dx,x,Nx, Ny, Nz, Δx, λ :: Function, c :: Function, ρ :: Function, boundary :: AbstractCubicBoundary, actuation :: AbstractIOSetup, input_signals :: Vector{T}) where T <: Real 
+function diffusion_dynamic_x!(dx,x,Nx, Ny, Nz, Δx, λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real 
     
     for iz in 1:Nz
         for iy in 1 : Ny
@@ -530,7 +547,7 @@ end
 
 
 
-function diffusion_dynamic_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Function, c :: Function, ρ :: Function, boundary :: AbstractCubicBoundary, actuation :: AbstractIOSetup, input_signals :: Vector{T}) where T <: Real 
+function diffusion_dynamic_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real 
     for iz in 1:Nz
         for ix in 1 : Nx
             for  iy in 2 : Ny-1
@@ -569,7 +586,7 @@ end
 
 
 
-function diffusion_dynamic_z!(dx,x,Nx, Ny, Nz, Δz,  λ :: Function, c :: Function, ρ :: Function, boundary :: AbstractCubicBoundary, actuation :: AbstractIOSetup, input_signals :: Vector{T}) where T <: Real 
+function diffusion_dynamic_z!(dx,x,Nx, Ny, Nz, Δz,  λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real 
     
     for ix in 1 : Nx
         for  iy in 1 : Ny

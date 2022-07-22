@@ -39,7 +39,7 @@ setEmission!(boundary_plate, emission_robin, boundary_west)
 setEmission!(boundary_plate, emission_robin, boundary_east)
 setEmission!(boundary_plate, emission_robin, boundary_north)
 
-const heatproblem = CubicHeatProblem(plate, boundary_plate)
+# const heatproblem = CubicHeatProblem(plate, boundary_plate)
 
 
 ### Actuation ###
@@ -90,14 +90,14 @@ setIOSetup!(plate_actuation, plate, partition2, config_table2,  pos_actuators2)
 
 # Uncontrolled / free system
 function heat_conduction!(dθ, θ, param, t)
-    property = heatproblem.geometry.segmentation.heatProperty;
-    boundary  = heatproblem.boundary
+    # property = heatproblem.geometry.segmentation.heatProperty;
+    # boundary  = heatproblem.boundary
 
     u_in = zeros(num_actuators1 + num_actuators2)
     u_in[1:num_actuators1] .= 4e5
     u_in[num_actuators1+1:end] .= 3e5
 
-    diffusion!(dθ, θ, heatproblem.geometry, property, boundary, plate_actuation, u_in)
+    diffusion!(dθ, θ, plate, property, boundary_plate, plate_actuation, u_in)
 end
 
 θinit = θ₀*ones(Ntotal)

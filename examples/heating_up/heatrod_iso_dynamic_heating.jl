@@ -30,7 +30,6 @@ boundary_right  = :east
 boundary_rod = initBoundary(heatrod)
 setEmission!(boundary_rod, emission_right, boundary_right)
 
-const heatproblem = CubicHeatProblem(heatrod, boundary_rod)
 
 ### Actuation ###
 pos_actuators = :west   # Position of actuators
@@ -46,11 +45,9 @@ input_id = 1
 setIOSetup!(rod_actuation, heatrod, input_id, scale,  pos_actuators)
 
 function heat_conduction!(dθ, θ, param, t)
-    property  = heatproblem.geometry.segmentation.heatProperty;
-    boundary  = heatproblem.boundary
     u_in = 4e5 * ones(1)    # heat input
 
-    diffusion!(dθ, θ, heatproblem.geometry, property, boundary, rod_actuation, u_in)
+    diffusion!(dθ, θ, heatrod, property, boundary_rod, rod_actuation, u_in)
 end
 
 # Initial conditions of ODE

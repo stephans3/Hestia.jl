@@ -39,7 +39,7 @@ setEmission!(boundary_plate, emission_robin, boundary_west)
 setEmission!(boundary_plate, emission_robin, boundary_east)
 setEmission!(boundary_plate, emission_robin, boundary_north)
 
-const heatproblem = CubicHeatProblem(plate, boundary_plate)
+# const heatproblem = CubicHeatProblem(plate, boundary_plate)
 
 
 ### Actuation ###
@@ -63,7 +63,7 @@ function heat_conduction!(dθ, θ, param, t)
 
     u_in = 4e7 * ones(num_actuators) # 4e5 * ones(num_actuators)    # heat input
 
-    diffusion!(dθ, θ, heatproblem.geometry, property, boundary, plate_actuation, u_in)
+    diffusion!(dθ, θ, plate, property, boundary_plate, plate_actuation, u_in)
     # diffusion!(dθ, θ, heatproblem.geometry, property, boundary)
 end
 

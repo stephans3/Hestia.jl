@@ -26,7 +26,8 @@ export createEmission, emit!, emit
 include("core/emission.jl")
 
 
-export HeatRodBoundary, HeatPlateBoundary, HeatCuboidBoundary
+#export HeatRodBoundary, HeatPlateBoundary, HeatCuboidBoundary
+export HeatCuboidBoundary
 export initBoundary, setEmission!, getEmission
 include("core/boundary.jl")
 

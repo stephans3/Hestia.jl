@@ -43,14 +43,9 @@ setEmission!(boundary_cuboid, emission_nonlinear, boundary_east)
 setEmission!(boundary_cuboid, emission_nonlinear, boundary_north)
 setEmission!(boundary_cuboid, emission_nonlinear, boundary_topside)
 
-const heatproblem = CubicHeatProblem(cuboid, boundary_cuboid)
-
 
 function heat_conduction!(dθ, θ, param, t)
-    property  = heatproblem.geometry.segmentation.heatProperty;
-    boundary  = heatproblem.boundary
-
-    diffusion!(dθ, θ, heatproblem.geometry, property, boundary)
+    diffusion!(dθ, θ, cuboid, property, boundary_cuboid)
 end
 
 # Initial conditions of ODE

@@ -29,13 +29,8 @@ boundary_right  = :east
 boundary_rod = initBoundary(heatrod)
 setEmission!(boundary_rod, emission_right, boundary_right)
 
-const heatproblem = CubicHeatProblem(heatrod, boundary_rod)
-
 function heat_conduction!(dθ, θ, param, t)
-    property  = heatproblem.geometry.segmentation.heatProperty;
-    boundary  = heatproblem.boundary
-
-    diffusion!(dθ, θ, heatproblem.geometry, property, boundary)
+    diffusion!(dθ, θ, heatrod, property, boundary_rod)
 end
 
 # Initial conditions of ODE
