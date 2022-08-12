@@ -31,7 +31,7 @@ end
 
 Returns a SimpleSegment
 """
-function createSimpleSegment( property :: AbstractIsotropicProperty, cellindices :: Array{S2, 1} where S2 <: Integer)
+function createSimpleSegment( property :: AbstractIsotropicProperty, cellindices :: Vector{S2} where S2 <: Integer)
     if length(cellindices) == 0
         error("Array cellindices is empty! It needs the indices of heat cells.")
     end
@@ -39,7 +39,12 @@ function createSimpleSegment( property :: AbstractIsotropicProperty, cellindices
 end
 
 
-
+function createSimpleSegment( property :: AbstractAnisotropicProperty, cellindices :: Vector{S2} where S2 <: Integer)
+    if length(cellindices) == 0
+        error("Array cellindices is empty! It needs the indices of heat cells.")
+    end
+    return SimpleSegment(property, cellindices)
+end
 
 """
     MixedSegment <: AbstractSegmentation 

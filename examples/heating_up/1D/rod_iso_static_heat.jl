@@ -44,7 +44,6 @@ setIOSetup!(rod_actuation, heatrod, input_id, scale,  pos_actuators)
 
 function heat_conduction!(dθ, θ, param, t)
     u_in = 4e5 * ones(1)    # heat input
-
     diffusion!(dθ, θ, heatrod, property, boundary_rod, rod_actuation, u_in)
 end
 

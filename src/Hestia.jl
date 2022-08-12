@@ -9,6 +9,8 @@ using Base: Tuple, Integer
 # Core utilities
 export StaticIsoProperty, DynamicIsoProperty
 export createStaticIsoProperty, createDynamicIsoProperty, getdiffusivity
+export StaticAnisoProperty, DynamicAnisoProperty
+export createStaticAnisoProperty, createDynamicAnisoProperty
 include("core/properties.jl")
 
 export AbstractSegmentation, SimpleSegment, MixedSegment, HyperSegment
@@ -22,7 +24,7 @@ include("core/geometry.jl")
 
 
 export Emission
-export createEmission, emit!, emit
+export createEmission, emit
 include("core/emission.jl")
 
 

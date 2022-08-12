@@ -27,19 +27,8 @@ A record for static isotropic properties.
 `c` : specific heat capacity
 """
 mutable struct StaticIsoProperty <: AbstractIsotropicProperty
-    """
-    λ - denotes the thermal conductivity
-    """
     λ :: Real # Thermal conductivity
-    
-    """
-    ρ - denotes the volumetric mass density
-    """
     ρ :: Real # Mass density
-    
-    """
-    c - denotes the specific heat capacity
-    """
     c :: Real # Specific heat capacity
 end
 
@@ -85,17 +74,17 @@ A record for static isotropic properties.
     `cᵢ` : specific heat capacity coefficients
 """
 mutable struct DynamicIsoProperty <: AbstractIsotropicProperty
-    λ :: Array{T,1} where T <: Real # Thermal conductivity
-    ρ :: Array{T,1} where T <: Real # Mass density
-    c :: Array{T,1} where T <: Real # Specific heat capacity
+    λ :: Vector{Real} # Thermal conductivity
+    ρ :: Vector{Real} # Mass density
+    c :: Vector{Real} # Specific heat capacity
 end
 
 """
-    createDynamicIsoProperty(conductivity :: Array{T,1}, density :: Array{T,1}, capacity :: Array{T,1})  where T <: Real
+createDynamicIsoProperty(conductivity :: Vector{T1}, density :: Vector{T2}, capacity :: Vector{T3}) where where {T1 <: Real, T2 <: Real, T3 <: Real}
 
 Returns a DynamicIsoProperty    
 """
-function createDynamicIsoProperty(conductivity :: Vector{T}, density :: Vector{T}, capacity :: Vector{T}) where T <: Real
+function createDynamicIsoProperty(conductivity :: Vector{T1}, density :: Vector{T2}, capacity :: Vector{T3}) where {T1 <: Real, T2 <: Real, T3 <: Real}
     λ = conductivity # Thermal conductivity
     ρ = density      # Mass density
     c = capacity     # Specific heat capacity
@@ -120,32 +109,91 @@ end
 
 
 
-#=
+
 """
 Static anisotropic properties
-λ = [λ₁ 0 0; 0 λ₂ 0 ; 0 0 λ₃]
+λ = diag(λx, λy, λz) = [λx 0 0; 0 λy 0 ; 0 0 λz]
 """
-mutable struct StaticAnisoProperty{T1 <: Array{S1,1} where S1 <: Real, T2 <: Real} <: AbstractAnisotropicProperty
-    λ :: T1 # Thermal conductivity
-    ρ :: T2 # Mass density
-    c :: T2 # Specific heat capacity
+mutable struct StaticAnisoProperty <: AbstractAnisotropicProperty
+    λx :: Real # Thermal conductivity in x-direction
+    λy :: Real # Thermal conductivity in y-direction
+    λz :: Real # Thermal conductivity in z-direction
+    ρ :: Real # Mass density
+    c :: Real # Specific heat capacity
+end
+
+
+function createStaticAnisoProperty(conductivity_x :: Real, conductivity_y :: Real, density :: Real, capacity :: Real)
+    λx = conductivity_x # Thermal conductivity
+    λy = conductivity_y # Thermal conductivity
+    λz = 0; # Thermal conductivity
+
+    ρ = density      # Mass density
+    c = capacity     # Specific heat capacity
+
+    return StaticAnisoProperty(λx, λy, λz, ρ, c)
+end
+
+
+function createStaticAnisoProperty(conductivity_x :: Real, conductivity_y :: Real, conductivity_z :: Real, density :: Real, capacity :: Real)
+    λx = conductivity_x # Thermal conductivity
+    λy = conductivity_y # Thermal conductivity
+    λz = conductivity_z # Thermal conductivity
+
+    ρ = density      # Mass density
+    c = capacity     # Specific heat capacity
+
+    return StaticAnisoProperty(λx, λy, λz, ρ, c)
+end
+
+
+
+mutable struct DynamicAnisoProperty <: AbstractAnisotropicProperty
+    λx :: Vector{Real} # Thermal conductivity in x-direction
+    λy :: Vector{Real} # Thermal conductivity in y-direction
+    λz :: Vector{Real} # Thermal conductivity in z-direction
+    ρ :: Vector{Real} # Mass density
+    c :: Vector{Real} # Specific heat capacity
+end
+
+
+
+"""
+createDynamicAnisoProperty(conductivity_x :: Vector{T}, conductivity_y :: Vector{T}, conductivity_z :: Vector{T},  density :: Vector{T}, capacity :: Vector{T}) where T <: Real
+
+Returns a DynamicAnisoProperty    
+"""
+function createDynamicAnisoProperty(conductivity_x :: Vector{T1}, 
+                                    conductivity_y :: Vector{T2}, 
+                                    density :: Vector{T3}, 
+                                    capacity :: Vector{T4}) where {T1 <: Real, T2 <: Real, T3 <: Real, T4 <: Real}
+    λx = conductivity_x # Thermal conductivity in x-direction
+    λy = conductivity_y # ... in y-direction
+    λz = Real[]         # ... in z-direction
+    ρ = density      # Mass density
+    c = capacity     # Specific heat capacity
+
+    return DynamicAnisoProperty(λx, λy, λz, ρ, c)
 end
 
 """
-Temperature-dependent anisotropic properties
-Dynamic anisotropic properties
-λ(θ) = [λ₁(θ) 0 0; 0 λ₂(θ) 0 ; 0 0 λ₃(θ)]
+createDynamicAnisoProperty(conductivity_x :: Vector{T}, conductivity_y :: Vector{T}, conductivity_z :: Vector{T},  density :: Vector{T}, capacity :: Vector{T}) where T <: Real
+
+Returns a DynamicAnisoProperty    
 """
-mutable struct DynamicAnisoProperty{T1 <: Array{S1,2} where S1 <: Real, T2 <: Array{S2,1} where S2 <: Real} <: AbstractAnisotropicProperty
-    λ :: T1 # Thermal conductivity
-    ρ :: T2 # Mass density
-    c :: T2 # Specific heat capacity
+function createDynamicAnisoProperty(conductivity_x :: Vector{T1}, 
+                                    conductivity_y :: Vector{T2}, 
+                                    conductivity_z :: Vector{T3},  
+                                    density :: Vector{T4}, 
+                                    capacity :: Vector{T5}) where {T1 <: Real, T2 <: Real, T3 <: Real, T4 <: Real, T5 <: Real}
+    λx = conductivity_x # Thermal conductivity in x-direction
+    λy = conductivity_y # ... in y-direction
+    λz = conductivity_z # ... in z-direction
+    ρ = density      # Mass density
+    c = capacity     # Specific heat capacity
+
+    return DynamicAnisoProperty(λx, λy, λz, ρ, c)
 end
-=#
-
-
-
-
 
 
 

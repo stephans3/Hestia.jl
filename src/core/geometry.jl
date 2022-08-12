@@ -1,3 +1,6 @@
+# Note: maybe remove segmentation
+
+
 abstract type AbstractGeometricalObject end
 abstract type AbstractCubicObject <: AbstractGeometricalObject end
 
@@ -9,6 +12,7 @@ abstract type AbstractCubicObject <: AbstractGeometricalObject end
 # 1D Heat Rod
 
 #############################################################
+
 
 
 
@@ -145,7 +149,7 @@ function HeatPlate( plate_length :: Real,
                     plate_width  ::  Real, 
                     Nx :: Integer, 
                     Ny :: Integer, 
-                    property :: AbstractIsotropicProperty  )
+                    property :: AbstractPhysicalProperty  )
 
     if plate_length <= 0 || plate_width <= 0
         error("Length and width have to be greater than zero!");
@@ -238,7 +242,7 @@ function HeatCuboid(cuboid_length :: Real,
                     Nx :: Integer, 
                     Ny :: Integer, 
                     Nz :: Integer, 
-                    property :: AbstractIsotropicProperty  )
+                    property :: AbstractPhysicalProperty  )
 
     if cuboid_length <= 0 || cuboid_width <= 0 || cuboid_height <= 0
         error("Length and width have to be greater than zero!");

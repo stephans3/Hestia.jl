@@ -55,34 +55,14 @@ function createEmission(conduction :: Real, emissivity :: Real, θamb :: Real)
     return Emission(conduction, radiation, θamb)
 end
 
-
-
-
 """
-    emit!(flux :: Array{S1,1} where S1 <: Real, temperature :: Array{S2,1} where S2 <: Real, emission :: Emission)
+    emit(temperature :: Real, emission :: Emission)
 
-Calculates the right-hand side of the natural Robin boundary along a boundary for a given `Emission`.
+Calculates the right-hand side of the boundary conditions for a given `Emission`.
 
-Note: in-place operation - results are saved in array `flux`.
-"""
-function emit!(flux :: Array{S1,1} where S1 <: Real, temperature :: Array{S2,1} where S2 <: Real, emission :: Emission)
-    θ = temperature
-    θamb = emission.θamb
-    h = emission.conduction
-    k = emission.radiation
-
-    flux .= (  -h *( θ .- θamb) - k*( θ.^4 .- θamb^4)  )
-
-    return nothing
-end
-
-
-"""
-    emit!(flux :: Array{S1,1} where S1 <: Real, temperature :: Array{S2,1} where S2 <: Real, emission :: Emission)
-
-Calculates the right-hand side of the natural Robin boundary along a boundary for a given `Emission`.
-
-Note: in-place operation - results are saved in array `flux`.
+```math
+\\Phi = -h ~ (\\theta - \\theta_{amb}) -k ~ (\\theta^4 - \\theta_{amb}^4)
+```
 """
 function emit(temperature :: Real, emission :: Emission)
     θ = temperature
@@ -94,6 +74,28 @@ function emit(temperature :: Real, emission :: Emission)
 
     return flux
 end
+
+
+"""
+emit!(flux :: Vector{T1}, temperature :: Vector{T2}, emission :: Emission) where {T1 <: Real, T2 <: Real}
+
+Calculates the right-hand side of the natural Robin boundary along a boundary for a given `Emission`.
+
+Note: in-place operation - results are saved in array `flux`.
+"""
+function emit!(flux :: Vector{T1}, temperature :: Vector{T2}, emission :: Emission) where {T1 <: Real, T2 <: Real}
+    θ = temperature
+    θamb = emission.θamb
+    h = emission.conduction
+    k = emission.radiation
+
+    flux .= (  -h *( θ .- θamb) - k*( θ.^4 .- θamb^4)  )
+
+    return nothing
+end
+
+
+
 
 
 

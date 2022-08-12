@@ -13,11 +13,21 @@ makedocs(;
         canonical="https://stephans3.github.io/Hestia.jl",
         assets=String[],
     ),
-    pages=[
-       "Home" => "index.md",
-  	    "Components" => "components.md",
+    pages=Any[
+       "Hestia.jl" => "index.md",
+       "Theory" => Any[
+         "theory/geometry_material.md",
+         "theory/boundary_conditions.md",
+         "theory/actuators.md"
+         ],
+       "Tutorials" => Any[
+         "examples/rod_1d.md",
+         "examples/plate_2d.md"
+        ], 
+   	    "Components" => "components.md"
     ],
 )
+
 
 deploydocs(;
     repo="github.com/stephans3/Hestia.jl.git",
