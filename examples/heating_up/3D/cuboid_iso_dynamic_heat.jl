@@ -58,7 +58,6 @@ curvature = 100.0;
 
 config  = setConfiguration(scale, power, curvature)
 
-# setActuation!(cuboid_actuation, cuboid, num_actuators, config,  pos_actuators)
 setIOSetup!(cuboid_actuation, cuboid, num_actuators, config,  pos_actuators)
 
 function heat_conduction!(dθ, θ, param, t)
@@ -76,7 +75,11 @@ import LinearAlgebra
 import OrdinaryDiffEq
 
 prob = OrdinaryDiffEq.ODEProblem(heat_conduction!,θinit,tspan)
-#sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.Euler(), dt=Δt, saveat=1.0)
+
+# Euler method
+# sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.Euler(), dt=Δt, saveat=1.0)
+
+# Runge-Kutta method
 sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.KenCarp5(), dt=Δt, saveat=1.0)
 
 

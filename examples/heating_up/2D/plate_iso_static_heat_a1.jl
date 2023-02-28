@@ -53,7 +53,6 @@ curvature = 100.0;
 
 config  = setConfiguration(scale, power, curvature)
 
-# setActuation!(plate_actuation, plate, num_actuators, config,  pos_actuators)
 setIOSetup!(plate_actuation, plate, num_actuators, config,  pos_actuators)
 
 
@@ -73,7 +72,11 @@ import LinearAlgebra
 import OrdinaryDiffEq
 
 prob = OrdinaryDiffEq.ODEProblem(heat_conduction!,θinit,tspan)
+
+# Euler method
 # sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.Euler(), dt=Δt, saveat=1.0)
+
+# Runge-Kutta method
 sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.KenCarp5(), saveat=1.0)
 
 using Plots

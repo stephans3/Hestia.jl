@@ -46,16 +46,14 @@ include("interface/iosetup.jl")
 
 # 
 #export induce!
-export HeatRodActuation, HeatPlateActuation, HeatCuboidActuation
-export initActuation, getActuation, setActuation!, checkActuation2D
-include("interface/actuators.jl")
+# export HeatRodActuation, HeatPlateActuation, HeatCuboidActuation
+# export initActuation, getActuation, setActuation!, checkActuation2D
+# include("interface/actuators.jl")
 
 # Core
 export CubicHeatProblem
 export diffusion!
 include("core/heatproblem.jl")
-
-
 
 
 end # module

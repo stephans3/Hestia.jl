@@ -39,16 +39,12 @@ setEmission!(boundary_plate, emission_robin, boundary_west)
 setEmission!(boundary_plate, emission_robin, boundary_east)
 setEmission!(boundary_plate, emission_robin, boundary_north)
 
-# const heatproblem = CubicHeatProblem(plate, boundary_plate)
-
-
 ### Actuation ###
 num_actuators1  = 5        # Number of actuators
 num_actuators2  = 7        # Number of actuators
 pos_actuators1 = :south   # Position of actuators
 pos_actuators2 = :north    # Position of actuators
 
-# plate_actuation = initActuation(plate)
 plate_actuation = initIOSetup(plate)
 
 # Create actuator characterization
@@ -80,19 +76,12 @@ partition2 = collect(num_actuators1+1:num_actuators1+num_actuators2)
 partition2[3] = 0
 partition2[5] = 0
 
-
-# setActuation!(plate_actuation, plate, partition1, config_table1,  pos_actuators1)
-# setActuation!(plate_actuation, plate, partition2, config_table2,  pos_actuators2)
-
 setIOSetup!(plate_actuation, plate, partition1, config_table1,  pos_actuators1)
 setIOSetup!(plate_actuation, plate, partition2, config_table2,  pos_actuators2)
 
 
 # Uncontrolled / free system
 function heat_conduction!(dθ, θ, param, t)
-    # property = heatproblem.geometry.segmentation.heatProperty;
-    # boundary  = heatproblem.boundary
-
     u_in = zeros(num_actuators1 + num_actuators2)
     u_in[1:num_actuators1] .= 4e5
     u_in[num_actuators1+1:end] .= 3e5
@@ -109,7 +98,11 @@ import LinearAlgebra
 import OrdinaryDiffEq
 
 prob = OrdinaryDiffEq.ODEProblem(heat_conduction!,θinit,tspan)
+
+# Euler method
 # sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.Euler(), dt=Δt, saveat=1.0)
+
+# Runge-Kutta method
 sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.KenCarp5(), saveat=1.0)
 
 

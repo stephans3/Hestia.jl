@@ -2,7 +2,9 @@
 Author: Stephan Scholz
 Year: 2022
 
-This file contains a simulation of the heat equation with input
+This file contains a simulation of the heat equation with input.
+Example: How to use a sensor setup with 3 sensors.
+
 Dimension: 2D
 Material: isotropic, static
 =#
@@ -39,9 +41,6 @@ setEmission!(boundary_plate, emission_robin, boundary_west)
 setEmission!(boundary_plate, emission_robin, boundary_east)
 setEmission!(boundary_plate, emission_robin, boundary_north)
 
-# const heatproblem = CubicHeatProblem(plate, boundary_plate)
-
-
 ### Actuation ###
 num_actuators = 5        # Number of actuators
 pos_actuators = :south   # Position of actuators
@@ -54,17 +53,12 @@ power     = 3;
 curvature = 100.0;
 
 config  = setConfiguration(scale, power, curvature)
-
 setIOSetup!(plate_actuation, plate, num_actuators, config,  pos_actuators)
 
 function heat_conduction!(dθ, θ, param, t)
-    property  = heatproblem.geometry.segmentation.heatProperty;
-    boundary  = heatproblem.boundary
-
     u_in = 4e7 * ones(num_actuators) # 4e5 * ones(num_actuators)    # heat input
 
     diffusion!(dθ, θ, plate, property, boundary_plate, plate_actuation, u_in)
-    # diffusion!(dθ, θ, heatproblem.geometry, property, boundary)
 end
 
 θinit = θ₀*ones(Ntotal)# θ₀*(1 .+ 0.1*sin.(1:1:Ntotal)) # θ₀*ones(Ntotal)
@@ -72,12 +66,14 @@ end
 tspan = (0.0, 200.0)
 Δt = 1e-2               # Sampling time
 
-
-
 import OrdinaryDiffEq
 prob = OrdinaryDiffEq.ODEProblem(heat_conduction!,θinit,tspan)
-sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.KenCarp5(), dt=Δt, saveat=1.0)
+
+# Euler method
 # sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.Euler(), dt=Δt, saveat=1.0)
+
+# Runge-Kutta method
+sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.KenCarp5(), dt=Δt, saveat=1.0)
 
 
 ### Sensor ###
@@ -92,9 +88,7 @@ power     = 2;
 curvature = 100.0;
 
 config_sensor  = setConfiguration(scale, power, curvature)
-
 setIOSetup!(plate_sensing, plate, num_sensor, config,  pos_sensor)
-
 measurementData = zeros(201,0)
 
 for i = 1 : num_sensor

@@ -45,8 +45,6 @@ setEmission!(boundary_cuboid, emission_nonlinear, boundary_topside)
 num_actuators = (4,3)        # Number of actuators
 pos_actuators = :underside   # Position of actuators
 num_act_total = num_actuators[1]*num_actuators[2]
-
-# cuboid_actuation = initActuation(cuboid)
 cuboid_actuation = initIOSetup(cuboid)
 
 # Create actuator characterization
@@ -56,7 +54,6 @@ curvature = 100.0;
 
 config  = setConfiguration(scale, power, curvature)
 
-# setActuation!(cuboid_actuation, cuboid, num_actuators, config,  pos_actuators)
 setIOSetup!(cuboid_actuation, cuboid, num_actuators, config,  pos_actuators)
 
 
@@ -86,7 +83,11 @@ import LinearAlgebra
 import OrdinaryDiffEq
 
 prob = OrdinaryDiffEq.ODEProblem(heat_conduction!,θinit,tspan)
+
+# Euler method
 # sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.Euler(), dt=Δt, saveat=1.0)
+
+# Runge-Kutta method
 sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.KenCarp5(), saveat=1.0)
 
 using Plots

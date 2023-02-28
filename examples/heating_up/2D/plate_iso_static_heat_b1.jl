@@ -44,9 +44,7 @@ num_actuators  = 5        # Number of actuators
 pos_actuators1 = :south   # Position of actuators
 pos_actuators2 = :north    # Position of actuators
 
-# plate_actuation = initActuation(plate)
 plate_actuation = initIOSetup(plate)
-
 
 # Create actuator characterization
 scale     = 1.0;
@@ -68,9 +66,6 @@ One input signal can be used for more than one partition cell if partition entry
 partition = collect(1:num_actuators)
 partition[2] = 0
 
-# setActuation!(plate_actuation, plate, partition, config_table,  pos_actuators1)
-# setActuation!(plate_actuation, plate, partition, config_table,  pos_actuators2)
-
 setIOSetup!(plate_actuation, plate, partition, config_table,  pos_actuators1)
 setIOSetup!(plate_actuation, plate, partition, config_table,  pos_actuators2)
 
@@ -91,9 +86,12 @@ import LinearAlgebra
 import OrdinaryDiffEq
 
 prob = OrdinaryDiffEq.ODEProblem(heat_conduction!,θinit,tspan)
-# sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.Euler(), dt=Δt, saveat=1.0)
-sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.KenCarp5(), saveat=1.0)
 
+# Euler method
+# sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.Euler(), dt=Δt, saveat=1.0)
+
+# Runge-Kutta method
+sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.KenCarp5(), saveat=1.0)
 
 using Plots
 heatmap(reshape(sol[end], Nx, Ny))

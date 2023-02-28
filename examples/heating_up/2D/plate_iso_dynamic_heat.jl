@@ -44,7 +44,6 @@ num_actuators = 5        # Number of actuators per boundary
 pos_actuators1 = :south  # Position of actuators
 pos_actuators2 = :west   # Position of actuators
 
-# plate_actuation = initActuation(plate)
 plate_actuation = initIOSetup(plate)
 
 # Create actuator characterization
@@ -53,9 +52,6 @@ power     = 3;
 curvature = 100.0;
 
 config  = setConfiguration(scale, power, curvature)
-
-# setActuation!(plate_actuation, plate, num_actuators, config,  pos_actuators1)
-# setActuation!(plate_actuation, plate, num_actuators, config,  pos_actuators2, start_index = 6)
 
 setIOSetup!(plate_actuation, plate, num_actuators, config,  pos_actuators1)
 setIOSetup!(plate_actuation, plate, num_actuators, config,  pos_actuators2, start_index = 6)
@@ -75,7 +71,11 @@ tspan = (0.0, 200.0)
 import OrdinaryDiffEq
 
 prob = OrdinaryDiffEq.ODEProblem(heat_conduction!,θinit,tspan)
+
+# Euler method
 # sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.Euler(), dt=Δt, saveat=1.0)
+
+# Runge-Kutta method
 sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.KenCarp5(), saveat=1.0)
 
 using Plots
