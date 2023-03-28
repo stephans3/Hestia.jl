@@ -103,9 +103,9 @@ end
 function diffusion_static_x!(dx,x,Nx, Ny, Nz, Δx, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary) # in-place 
     α = λ/(c*ρ) # Diffusivity
 
-    for iz in 1:Nz      
-        for iy in 1 : Ny
-            for ix in 2 : Nx-1
+    @inbounds for iz in 1:Nz      
+        @inbounds for iy in 1 : Ny
+            @inbounds for ix in 2 : Nx-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
                 
                 dx[i] = α * (x[i-1] + x[i+1] - 2*x[i])/Δx^2 
@@ -127,9 +127,9 @@ end
 function diffusion_static_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary) # in-place
     α = λ/(c*ρ)
     
-    for iz in 1:Nz
-        for ix in 1 : Nx
-            for  iy in 2 : Ny-1
+    @inbounds for iz in 1:Nz
+        @inbounds for ix in 1 : Nx
+            @inbounds for  iy in 2 : Ny-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
                 
                 dx[i] = dx[i] + α * (x[i-Nx] + x[i+Nx] - 2*x[i])/Δy^2 
@@ -153,9 +153,9 @@ function diffusion_static_z!(dx,x,Nx, Ny, Nz, Δz, λ :: Real, c :: Real, ρ :: 
     α = λ/(c*ρ)
     
     
-    for ix in 1 : Nx
-        for  iy in 1 : Ny
-            for iz in 2:Nz-1
+    @inbounds for ix in 1 : Nx
+        @inbounds for  iy in 1 : Ny
+            @inbounds for iz in 2:Nz-1
 
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
                 
@@ -280,9 +280,9 @@ end
 
 function diffusion_dynamic_x!(dx,x,Nx, Ny, Nz, Δx, λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary ) # in-place
     
-    for iz in 1:Nz
-        for iy in 1 : Ny
-            for ix in 2 : Nx-1
+    @inbounds for iz in 1:Nz
+        @inbounds for iy in 1 : Ny
+            @inbounds for ix in 2 : Nx-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
                 x̅1 =  (x[i-1] + x[i])/2
                 x̅2 =  (x[i+1] + x[i])/2
@@ -311,9 +311,9 @@ end
 
 
 function diffusion_dynamic_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary ) # in-place
-    for iz in 1:Nz
-        for ix in 1 : Nx
-            for  iy in 2 : Ny-1
+    @inbounds for iz in 1:Nz
+        @inbounds for ix in 1 : Nx
+            @inbounds for  iy in 2 : Ny-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
     
     
@@ -345,9 +345,9 @@ end
 
 function diffusion_dynamic_z!(dx,x,Nx, Ny, Nz, Δz,  λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary) # in-place
     
-    for ix in 1 : Nx
-        for  iy in 1 : Ny
-            for iz in 2:Nz-1
+    @inbounds for ix in 1 : Nx
+        @inbounds for  iy in 1 : Ny
+            @inbounds for iz in 2:Nz-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
                 x̅1 =  (x[i-Nx*Ny] + x[i])/2
                 x̅2 =  (x[i+Nx*Ny] + x[i])/2
@@ -481,9 +481,9 @@ end
 function diffusion_static_x!(dx, x, Nx, Ny, Nz, Δx, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real  # in-place 
     α = λ/(c*ρ) # Diffusivity
 
-    for iz in 1:Nz
-        for iy in 1 : Ny
-            for ix in 2 : Nx-1
+    @inbounds for iz in 1:Nz
+        @inbounds for iy in 1 : Ny
+            @inbounds for ix in 2 : Nx-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
                 
                 dx[i] = α * (x[i-1] + x[i+1] - 2*x[i])/Δx^2 
@@ -512,9 +512,9 @@ end
 function diffusion_static_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real # in-place
     α = λ/(c*ρ)
     
-    for iz in 1:Nz
-        for ix in 1 : Nx
-            for  iy in 2 : Ny-1
+    @inbounds for iz in 1:Nz
+        @inbounds for ix in 1 : Nx
+            @inbounds for  iy in 2 : Ny-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
                 
                 dx[i] = dx[i] + α * (x[i-Nx] + x[i+Nx] - 2*x[i])/Δy^2 
@@ -544,9 +544,9 @@ function diffusion_static_z!(dx,x,Nx, Ny, Nz, Δz, λ :: Real, c :: Real, ρ :: 
     α = λ/(c*ρ)
     
     
-    for ix in 1 : Nx
-        for  iy in 1 : Ny
-            for iz in 2:Nz-1
+    @inbounds for ix in 1 : Nx
+        @inbounds for  iy in 1 : Ny
+            @inbounds for iz in 2:Nz-1
 
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
                 
@@ -689,9 +689,9 @@ end
 
 function diffusion_dynamic_x!(dx,x,Nx, Ny, Nz, Δx, λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real 
     
-    for iz in 1:Nz
-        for iy in 1 : Ny
-            for ix in 2 : Nx-1
+    @inbounds for iz in 1:Nz
+        @inbounds for iy in 1 : Ny
+            @inbounds for ix in 2 : Nx-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
                 x̅1 =  (x[i-1] + x[i])/2
                 x̅2 =  (x[i+1] + x[i])/2
@@ -726,9 +726,9 @@ end
 
 
 function diffusion_dynamic_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real 
-    for iz in 1:Nz
-        for ix in 1 : Nx
-            for  iy in 2 : Ny-1
+    @inbounds for iz in 1:Nz
+        @inbounds for ix in 1 : Nx
+            @inbounds for  iy in 2 : Ny-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
     
     
@@ -766,9 +766,9 @@ end
 
 function diffusion_dynamic_z!(dx,x,Nx, Ny, Nz, Δz,  λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real 
     
-    for ix in 1 : Nx
-        for  iy in 1 : Ny
-            for iz in 2:Nz-1
+    @inbounds for ix in 1 : Nx
+        @inbounds for  iy in 1 : Ny
+            @inbounds for iz in 2:Nz-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
                 x̅1 =  (x[i-Nx*Ny] + x[i])/2
                 x̅2 =  (x[i+Nx*Ny] + x[i])/2

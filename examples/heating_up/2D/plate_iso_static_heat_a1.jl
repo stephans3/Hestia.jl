@@ -59,25 +59,34 @@ setIOSetup!(plate_actuation, plate, num_actuators, config,  pos_actuators)
 function heat_conduction!(dθ, θ, param, t)
     u_in = 4e5 * ones(num_actuators)    # heat input
 
-    diffusion!(dθ, θ, plate, property, boundary_plate, plate_actuation, u_in)
+    diffusion_fast!(dθ, θ, plate, property, boundary_plate, plate_actuation, u_in)
 end
+
 
 θinit = θ₀*ones(Ntotal)
 
 tspan = (0.0, 200.0)
-Δt = 1e-2               # Sampling time
+Δt = 1e-2 # Sampling time
 
 
 import LinearAlgebra
 import OrdinaryDiffEq
+import ModelingToolkit
 
-prob = OrdinaryDiffEq.ODEProblem(heat_conduction!,θinit,tspan)
+prob = OrdinaryDiffEq.ODEProblem(heat_conduction!,θinit,tspan);
+prob1 = ModelingToolkit.modelingtoolkitize(prob);
+prob2 = OrdinaryDiffEq.ODEProblem(prob1, [], tspan, jac = true, sparse=true);
+
+# Runge-Kutta method
+alg = OrdinaryDiffEq.KenCarp5();
+sol_mtk = OrdinaryDiffEq.solve(prob2,alg, saveat = 1.0);
+
+using BenchmarkTools
+@btime OrdinaryDiffEq.solve(prob2,alg, saveat = 1.0);
+
 
 # Euler method
 # sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.Euler(), dt=Δt, saveat=1.0)
 
-# Runge-Kutta method
-sol = OrdinaryDiffEq.solve(prob,OrdinaryDiffEq.KenCarp5(), saveat=1.0)
-
 using Plots
-heatmap(reshape(sol[end], Nx, Ny))
+heatmap(reshape(sol_mtk[end], Nx, Ny))

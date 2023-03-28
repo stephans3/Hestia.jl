@@ -4,7 +4,7 @@ Year: 2022
 
 This file contains a simulation of the heat equation with input
 Dimension: 2D
-Material: isotropic, dynamic
+Material: anisotropic, dynamic
 =#
 
 using Hestia 

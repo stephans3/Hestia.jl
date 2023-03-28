@@ -55,5 +55,7 @@ export CubicHeatProblem
 export diffusion!
 include("core/heatproblem.jl")
 
+export diffusion_fast!, diffusion_fast_xy!
+include("experimental/heatproblem_fast.jl")
 
 end # module
