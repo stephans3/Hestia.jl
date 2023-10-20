@@ -315,11 +315,8 @@ function diffusion_dynamic_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Function, c :: Functio
         @inbounds for ix in 1 : Nx
             @inbounds for  iy in 2 : Ny-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
-    
-    
                 x̅1 =  (x[i-Nx] + x[i])/2
                 x̅2 =  (x[i+Nx] + x[i])/2
-                
                 dx[i] = dx[i] +  (λ(x̅1) * x[i-Nx] + λ(x̅2) * x[i+Nx] - (λ(x̅1) + λ(x̅2))*x[i])/(Δy^2 * ρ(x[i]) * c(x[i]))
     
             end

@@ -82,7 +82,7 @@ pos_sensor = :north   # Position of sensors
 
 plate_sensing = initIOSetup(plate)
 
-# Create actuator characterization
+# Create sensor characterization
 scale     = 1.0;
 power     = 2;
 curvature = 100.0;

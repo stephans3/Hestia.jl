@@ -151,7 +151,8 @@ function characterize(start :: Real, stop :: Real, step :: Real, config :: Radia
     M   = config.curvature
     ν   = config.power
 
-    spatial_char = A * exp.( -abs.(M[dim,dim] * (span .- xc)).^(2*ν) )
+    
+	spatial_char = A * exp.( -(M[dim,dim] * (span .- xc)).^(2*ν) )
 
     return spatial_char
 end
