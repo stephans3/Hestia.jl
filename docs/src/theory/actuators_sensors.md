@@ -1,4 +1,4 @@
-# [Actuators and Spatial Characterization](@id actuators)
+# [Actuators and Sensors](@id actuators)
 
 Actuators are assumed only on the boundary sides of the geometrical object - not inside the object. It is possible to place more than one actuator on one boundary side. So, boundary sides with actuators are subdivided in **partitions** of equal size. In each partition we can specify wheter one actuator is assumed or not. It is not possible to specify more than one actuator per partition. If for instance 5 actuators are assumed on boundary `:south` then 5 partitions are created.
 
@@ -33,3 +33,8 @@ The central point of each partition is calculated internally, all other values h
 - spatial characterization $b_{n}(x)$ is 2-dimensional function, $x=(x_{1},x_{2})$
 
 
+# Sensors
+
+```@docs
+measure
+```

@@ -20,9 +20,42 @@ abstract type  AbstractSegmentation end
 A container that identifies a list of cells with its thermal property.
 """
 mutable struct SimpleSegment <: AbstractSegmentation 
-    heatProperty :: AbstractPhysicalProperty 
-    cellIndices  :: Array{T, 1} where T <: Integer
+    property :: AbstractMaterialProperty 
+    cellindices  :: Array{T, 1} where T <: Integer
+
+    function SimpleSegment( property :: AbstractMaterialProperty, cellindices :: Vector{<:Integer})
+        if length(cellindices) == 0
+            error("Array cellindices is empty! It needs the indices of heat cells.")
+        end
+        new(property, cellindices)
+    end
 end
+
+
+function SimpleSegment(property :: AbstractMaterialProperty, geometry :: HeatRod)
+    Nx = geometry.heatcells[1];
+    cellindices     = [_ for _=1:Nx]
+    return SimpleSegment(property, cellindices)
+end
+
+
+function SimpleSegment(property :: AbstractMaterialProperty, geometry :: HeatPlate)
+    Nx = geometry.heatcells[1];
+    Ny = geometry.heatcells[2];
+    cellindices     = [_ for _=1:Nx*Ny]
+    return SimpleSegment(property, cellindices)
+end
+
+
+
+function SimpleSegment(property :: AbstractMaterialProperty, geometry :: HeatCuboid)
+    Nx = geometry.heatcells[1];
+    Ny = geometry.heatcells[2];
+    Nz = geometry.heatcells[3];
+    cellindices     = [_ for _=1:Nx*Ny*Nz]
+    return SimpleSegment(property, cellindices)
+end
+
 
 
 
@@ -46,13 +79,19 @@ function createSimpleSegment( property :: AbstractAnisotropicProperty, cellindic
     return SimpleSegment(property, cellindices)
 end
 
+
+
+
+
+# Not yet implemented
+
 """
     MixedSegment <: AbstractSegmentation 
 
 A container that identifies each element of a list of cells with its own specific thermal property.
 """
 mutable struct MixedSegment <: AbstractSegmentation 
-    heatProperties :: Array{T1,1} where T1 <: AbstractPhysicalProperty
+    heatProperties :: Array{T1,1} where T1 <: AbstractMaterialProperty
     cellIndices    :: Array{T2,1} where T2 <: Integer
 end
 

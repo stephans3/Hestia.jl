@@ -1,43 +1,39 @@
 using Hestia 
 
-λ = 50.0    # Thermal conductivity: constant
-ρ = 8000.0  # Mass density: constant
-c = 400.0   # Specific heat capacity: constant
-property = createStaticIsoProperty(λ, ρ, c)
+λ = 50    # Thermal conductivity: constant
+ρ = 8000  # Mass density: constant
+c = 400   # Specific heat capacity: constant
+property = StaticIsotropic(λ, ρ, c)
 
-L = 0.2     # Length
+L = 0.2    # Length
 Nx = 40    # Number of elements: x direction
-heatrod  = HeatRod(L, Nx, property)
+heatrod  = HeatRod(L, Nx)
 
 ### Boundaries ###
-h = 5.0
-ϵ = 0.0
-θamb = 300.0;
-emission  = createEmission(h, ϵ, θamb)   # Only convection
-
-boundary_rod  = initBoundary(heatrod)
-boundary_side = :east 
-setEmission!(boundary_rod, emission, boundary_side)
+h = 5.0 # Heat transfer coefficient
+ϵ = 0.2 # Heat radiation coefficient
+θamb = 300; # Ambient temperature
+emission = Emission(h, ϵ, θamb)   # Convection and radiation
+boundary = Boundary(heatrod)
+setEmission!(boundary, emission, :east )
 
 
 ### Actuation ###
-rod_actuation = initIOSetup(heatrod)
-
+rod_actuation = IOSetup(heatrod)
 scale         = 1.0;  # b=1
 input_id      = 1     # Actuator index
 pos_actuators = :west # Position of actuators
 setIOSetup!(rod_actuation, heatrod, input_id, scale,  pos_actuators)
 
 
-
 ### Simulation ###
 function heat_conduction!(dθ, θ, param, t)
-    u_in = 4e5 * ones(1)    # heat input
-    diffusion!(dθ, θ, heatrod, property, boundary_rod, rod_actuation, u_in)
+    u_in = 2e5 * ones(1)    # heat input
+    diffusion!(dθ, θ, heatrod, property, boundary, rod_actuation, u_in)
 end
 
-θinit = 300*ones(Nx)
-tspan = (0.0, 600.0)
+θinit = 300*ones(Nx) # Inital temperatures
+tspan = (0.0, 600.0) # Time span
 
 ### Forward Euler method
 Δx = heatrod.sampling[1]  # Spatial discretization
@@ -50,15 +46,15 @@ if Δt > dt_max
     error("Numerical stability is not guaranteed! Choose a smaller sampling time.")
 end
 
-import OrdinaryDiffEq
-alg = OrdinaryDiffEq.Euler();
-prob = OrdinaryDiffEq.ODEProblem(heat_conduction!,θinit,tspan)
-sol = OrdinaryDiffEq.solve(prob,alg, dt=Δt, saveat=1.0)
+using OrdinaryDiffEq
+alg = Euler();
+prob= ODEProblem(heat_conduction!,θinit,tspan)
+sol = solve(prob,alg, dt=Δt, saveat=1.0)
 
 
 ### Adaptive numerical integration
-alg_2 = OrdinaryDiffEq.KenCarp5()
-sol_2 = OrdinaryDiffEq.solve(prob,alg_2, saveat=1.0)
+alg_2 = KenCarp5()
+sol_2 = solve(prob,alg_2, saveat=1.0)
 
 
 ### Proportional control ###

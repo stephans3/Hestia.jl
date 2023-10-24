@@ -3,11 +3,12 @@
 *.jl.mem
 /docs/build/
 
-
+/docs/src/index_old.md
 /docs/Manifest.toml
 Manifest.toml
 
 /src/experimental/*
+/src/deprecated/*
 
 # PDF output - usually a bad idea to keep this in Git
 *.pdf

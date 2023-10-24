@@ -11,49 +11,40 @@ abstract type AbstractEmission end
 """
     Emission  <: AbstractEmission
 
-Returns the right-hand side of a natural Robin boundary condition including heat conduction and emission to the environment.
+Type Emission contains the coefficients for heat transfer (convection) `h`, heat radiation `k`, and the ambient temperature `θamb` to model linear or nonlinear Stefan-Boltzmann boundary conditions
+    
+```math
+\\Phi = -h ~ (\\theta - \\theta_{amb}) -k ~ (\\theta^4 - \\theta_{amb}^4)
+```    
+
+Constructor `Emission(h,ϵ,θamb)` expects emissivity `ϵ` which must be in interval [0,1]. The heat radiation coefficient is calculated internally as `k=ϵ⋅σ` using the Stefan-Boltzmann constant: `σ = 5.6703744191844294e-8`.
 
 ### Elements
 
-`conduction` : heat conduction coefficient
+`h` : heat transfer coefficient
 
-`radiation` : heat radiation coefficient
+`k` : heat radiation coefficient
 
 `θamb` : ambient temperature
 """
 mutable struct Emission <: AbstractEmission 
-   conduction :: Real  # Heat conduction coefficient
-   radiation :: Real   # Heat radiation coefficient
-   θamb :: Real          # Ambient temperature  
-end
+   h :: Real  # Heat conduction coefficient
+   k :: Real   # Heat radiation coefficient
+   θamb :: Real        # Ambient temperature  
 
-
-
-"""
-    createEmission(conduction :: Real, emissivity :: Real, θamb :: Real)
-
-Returns an `Emission` for a given `conductivity`, `emissivity` and ambient temperature `θamb`
-
-### Information
-This constant is used:
-
-- Stefan-Boltzmann constant: `σ = 5.6703744191844294e-8`
-
-"""
-function createEmission(conduction :: Real, emissivity :: Real, θamb :: Real)
-    if emissivity < 0 || emissivity > 1
+   function Emission(h, ϵ, θamb)
+    if ϵ < 0 || ϵ > 1
         error("Emissivity has to be in interval [0, 1]!")
-    elseif conduction < 0
-        error("Conduction has to be greater than zero!")
+    elseif h < 0
+        error("Heat transfer coefficient has to be greater than zero!")
     end
-
-    
     sb = 5.6703744191844294e-8
-
-    radiation = emissivity * sb
-
-    return Emission(conduction, radiation, θamb)
+    new(h, sb*ϵ, θamb )
+   end
 end
+
+
+
 
 """
     emit(temperature :: Real, emission :: Emission)
@@ -67,8 +58,8 @@ Calculates the right-hand side of the boundary conditions for a given `Emission`
 function emit(temperature :: Real, emission :: Emission)
     θ = temperature
     θamb = emission.θamb
-    h = emission.conduction
-    k = emission.radiation
+    h = emission.h
+    k = emission.k
 
     flux = (  -h *( θ - θamb) - k*( θ^4 - θamb^4)  )
 
@@ -77,20 +68,19 @@ end
 
 
 """
-emit!(flux :: Vector{T1}, temperature :: Vector{T2}, emission :: Emission) where {T1 <: Real, T2 <: Real}
+    emit!(flux :: Vector{<:Real}, temperature :: Vector{<:Real}, emission :: Emission)
 
 Calculates the right-hand side of the natural Robin boundary along a boundary for a given `Emission`.
 
 Note: in-place operation - results are saved in array `flux`.
 """
-function emit!(flux :: Vector{T1}, temperature :: Vector{T2}, emission :: Emission) where {T1 <: Real, T2 <: Real}
+function emit!(flux :: Vector{<:Real}, temperature :: Vector{<:Real}, emission :: Emission)
     θ = temperature
     θamb = emission.θamb
-    h = emission.conduction
-    k = emission.radiation
+    h = emission.h
+    k = emission.k
 
-    flux .= (  -h *( θ .- θamb) - k*( θ.^4 .- θamb^4)  )
-
+    @. flux = (-h*(θ - θamb) - k*(θ^4 - θamb^4))
     return nothing
 end
 

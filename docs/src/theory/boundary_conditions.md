@@ -5,7 +5,7 @@ The temperature $\theta$ inside the geometrical object is driven by
 
 We denote the heat flux
 - inwards the object as **induced** heat flux $\Phi_{in}$ and
-- outwards the object as **emitted** heat flux $\Phi_{out}$ (**Emission**).
+- outwards the object as **emitted** heat flux $\Phi_{out}$ or Emission.
 
 Mathematically spoken, the situation on the boundary sides are described here by [Neumann](https://en.wikipedia.org/wiki/Neumann_boundary_condition) or [Robin boundary conditions](https://en.wikipedia.org/wiki/Neumann_boundary_condition). On boundary sides where actuators (e.g. heating elements) are assumed, we have
 
@@ -31,13 +31,13 @@ Emission
 ```
 
 ```@docs
-createEmission
-```
-
-```@docs
 emit
 ```
 
+
+```@docs
+emit!
+```
 
 ## Induced heat flux
 

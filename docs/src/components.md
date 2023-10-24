@@ -17,13 +17,6 @@ Order   = [:type, :function, ]
 Private = false
 ```
 
-## Segmentation
-```@autodocs
-Modules = [Hestia]
-Pages   = ["segmentation.jl"]
-Order   = [:type, :function, ]
-Private = false
-```
 
 ## Boundary
 ```@autodocs
@@ -33,18 +26,18 @@ Order   = [:type, :function, ]
 Private = false
 ```
 
-## Emission
-```@autodocs
-Modules = [Hestia]
-Pages   = ["emission.jl"]
-Order   = [:type, :function, ]
-Private = false
-```
-
 ## Configuration
 ```@autodocs
 Modules = [Hestia]
 Pages   = ["characterization.jl"]
+Order   = [:type, :function, ]
+Private = false
+```
+
+## IOSetup
+```@autodocs
+Modules = [Hestia]
+Pages   = ["iosetup.jl"]
 Order   = [:type, :function, ]
 Private = false
 ```

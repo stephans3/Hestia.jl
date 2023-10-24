@@ -1,10 +1,5 @@
-# Note: maybe remove segmentation
-
-
 abstract type AbstractGeometricalObject end
 abstract type AbstractCubicObject <: AbstractGeometricalObject end
-
-
 
 
 #############################################################
@@ -27,24 +22,21 @@ Model of an one dimensional rod for heat conduction
 `sampling` : spatial discretization 
 
 `heatcells` : number of heatcells
-
-`segmentation` : underlying segmentation (material), e.g. SimpleSegment or MixedSegment
 """
 
 struct HeatRod <: AbstractCubicObject
     dimension :: Real         # Length of rod
     sampling  :: Real         # Spatial discretization: Δx
     heatcells :: Integer      # Number of heatcells 
-    segmentation :: AbstractSegmentation     # Segmentation
 end
 
 
 """
-    HeatRod(rod_length :: Real,  heatcells :: Integer, segmentation :: T where T <: AbstractSegmentation )
+    HeatRod(rod_length :: Real,  heatcells :: Integer )
 
 Returns a HeatRod model
 """
-function HeatRod(rod_length :: Real,  heatcells :: Integer, segmentation :: T where T <: AbstractSegmentation )
+function HeatRod(rod_length :: Real,  heatcells :: Integer)
     if rod_length <= 0
         error("Length has to be greater than zero!");
         return nothing;
@@ -57,29 +49,9 @@ function HeatRod(rod_length :: Real,  heatcells :: Integer, segmentation :: T wh
     dimension = rod_length;
     sampling = rod_length / heatcells
 
-    return HeatRod(dimension, sampling, heatcells, segmentation)
+    return HeatRod(dimension, sampling, heatcells)
 end
 
-
-
-function HeatRod(rod_length :: Real,  heatcells :: Integer, property :: AbstractIsotropicProperty )
-    if rod_length <= 0
-        error("Length has to be greater than zero!");
-        return nothing;
-    end
-    if heatcells < 1
-        error("Number of elements of heatcells is less than one. Array of heat cells has to have at least one element.")
-        return nothing;
-    end
-
-    dimension = rod_length;
-    sampling = rod_length / heatcells
-
-    cellindices     = [_ for _=1:heatcells]
-    segmentation    = createSimpleSegment(property, cellindices)
-
-    return HeatRod(dimension, sampling, heatcells, segmentation)
-end
 
 
 
@@ -100,28 +72,24 @@ Model of a two dimensional plate for heat conduction
 `sampling` : tuple of spatial discretization: (Δx, Δy)
 
 `heatcells` : Number of heatcells per direction: {Nx, Ny}
-
-`segmentation` : underlying segmentation, e.g. SimpleSegment or MixedSegment
 """
 struct HeatPlate <: AbstractCubicObject
     dimension :: Tuple{T1, T1}  where T1 <: Real    # {Length, Width} of plate
     sampling  :: Tuple{T2, T2}  where T2 <: Real    # Spatial discretization: {Δx, Δy}
     heatcells :: Tuple{T3, T3}  where T3 <: Integer # Number of heatcells per direction: {Nx, Ny}
-    segmentation :: AbstractSegmentation        # Segmentation
 end
 
 
 
 """
-    HeatPlate(plate_length :: Real, plate_width ::  Real, Nx :: Integer, Ny :: Integer, heatcells :: Array{S,1} where S <: Real, segmentation :: T where T <: AbstractSegmentation)
+    HeatPlate(plate_length :: Real, plate_width ::  Real, Nx :: Integer, Ny :: Integer, heatcells :: Array{S,1} where S <: Real)
 
 Returns a HeatPlate model
 """
 function HeatPlate( plate_length :: Real, 
                     plate_width  ::  Real, 
                     Nx :: Integer, 
-                    Ny :: Integer, 
-                    segmentation :: T where T <: AbstractSegmentation )
+                    Ny :: Integer)
 
     if plate_length <= 0 || plate_width <= 0
         error("Length and width have to be greater than zero!");
@@ -140,39 +108,7 @@ function HeatPlate( plate_length :: Real,
     sampling  = (Δx, Δy)                        # Spatial discretization: {Δx, Δy}
     heatcells = (Nx, Ny)
     
-    return HeatPlate(dimension, sampling, heatcells, segmentation)
-
-end
-
-
-function HeatPlate( plate_length :: Real, 
-                    plate_width  ::  Real, 
-                    Nx :: Integer, 
-                    Ny :: Integer, 
-                    property :: AbstractPhysicalProperty  )
-
-    if plate_length <= 0 || plate_width <= 0
-        error("Length and width have to be greater than zero!");
-        return nothing;
-    end
-
-    if Nx < 2 || Ny < 2
-        error("Number of column and row elements have to be greater than two!");
-        return nothing;
-    end
-  
-    Δx = plate_length/Nx;
-    Δy = plate_width/Ny;
-
-    dimension = (plate_length, plate_width)     # {Length, Width} of plate
-    sampling  = (Δx, Δy)                        # Spatial discretization: {Δx, Δy}
-    heatcells = (Nx, Ny)
-    
-    cellindices     = [_ for _=1:Nx*Ny]
-    segmentation    = createSimpleSegment(property, cellindices)
-
-    return HeatPlate(dimension, sampling, heatcells, segmentation)
-
+    return HeatPlate(dimension, sampling, heatcells)
 end
 
 
@@ -192,14 +128,11 @@ Model of a two dimensional plate for heat conduction
 `sampling` : tuple of spatial discretization: (Δx, Δy, Δz)
 
 `heatcells` : number of heatcells in total
-
-`segmentation` : underlying segmentation, e.g. SimpleSegment or MixedSegment
 """
 struct HeatCuboid <: AbstractCubicObject
     dimension :: Tuple{T1, T1, T1}  where T1 <: Real    # {Length, Width, Height} of cuboid
     sampling  :: Tuple{T2, T2, T2}  where T2 <: Real    # Spatial discretization: {Δx, Δy, Δz}
     heatcells :: Tuple{T3, T3, T3}  where T3 <: Integer # Number of heatcells per direction: {Nx, Ny, Nz} 
-    segmentation :: AbstractSegmentation                # Segmentation
 end
 
 
@@ -208,8 +141,7 @@ function HeatCuboid(cuboid_length :: Real,
                     cuboid_height ::  Real,
                     Nx :: Integer, 
                     Ny :: Integer, 
-                    Nz :: Integer, 
-                    segmentation :: T where T <: AbstractSegmentation )
+                    Nz :: Integer)
 
     if cuboid_length <= 0 || cuboid_width <= 0 || cuboid_height <= 0
         error("Length and width have to be greater than zero!");
@@ -221,7 +153,6 @@ function HeatCuboid(cuboid_length :: Real,
         return nothing;
     end
    
-
     Δx = cuboid_length/Nx;
     Δy = cuboid_width/Ny;
     Δz = cuboid_height/Nz;
@@ -230,43 +161,7 @@ function HeatCuboid(cuboid_length :: Real,
     sampling  = (Δx, Δy, Δz)                                    # Spatial discretization: {Δx, Δy}
     heatcells = (Nx, Ny, Nz)
 
-    return HeatCuboid(dimension, sampling, heatcells, segmentation)
-
-end
-
-
-
-function HeatCuboid(cuboid_length :: Real, 
-                    cuboid_width  ::  Real, 
-                    cuboid_height ::  Real,
-                    Nx :: Integer, 
-                    Ny :: Integer, 
-                    Nz :: Integer, 
-                    property :: AbstractPhysicalProperty  )
-
-    if cuboid_length <= 0 || cuboid_width <= 0 || cuboid_height <= 0
-        error("Length and width have to be greater than zero!");
-        return nothing;
-    end
-
-    if Nx <= 0 || Ny <= 0 || Nz <= 0
-        error("Number of column and row elements have to be greater than zero!");
-        return nothing;
-    end
-  
-
-    Δx = cuboid_length/Nx;
-    Δy = cuboid_width/Ny;
-    Δz = cuboid_height/Nz;
-
-    dimension = (cuboid_length, cuboid_width, cuboid_height)    # {Length, Width} of plate
-    sampling  = (Δx, Δy, Δz)                                    # Spatial discretization: {Δx, Δy}
-    heatcells = (Nx, Ny, Nz)
-
-    cellindices     = [_ for _=1:Nx*Ny*Nz]
-    segmentation    = createSimpleSegment(property, cellindices)
-
-    return HeatCuboid(dimension, sampling, heatcells, segmentation)
+    return HeatCuboid(dimension, sampling, heatcells)
 end
 
 

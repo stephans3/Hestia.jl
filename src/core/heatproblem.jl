@@ -5,11 +5,19 @@ struct CubicHeatProblem <:AbstractHeatProblem
     boundary    :: CubicBoundary
 end
 
+function diffusion!(dθ :: AbstractArray{<: Real}, 
+    θ :: AbstractArray{<: Real},  
+    heatrod :: HeatRod, 
+    boundary :: CubicBoundary)
+
+    
+end
+
 
 function diffusion!(dθ :: AbstractArray{T1}, 
                     θ :: AbstractArray{T2},  
                     heatrod :: HeatRod, 
-                    property :: StaticIsoProperty, 
+                    property :: StaticIsotropic, 
                     boundary :: CubicBoundary) where {T1 <: Real, T2 <: Real}
     λ = property.λ # Thermal conductivity
     c = property.c # capacity
@@ -26,7 +34,7 @@ end
 function diffusion!(dθ :: AbstractArray{T1}, 
                     θ :: AbstractArray{T2},  
                     heatplate :: HeatPlate, 
-                    property :: StaticIsoProperty, 
+                    property :: StaticIsotropic, 
                     boundary :: CubicBoundary ) where {T1 <: Real, T2 <: Real}
     λ = property.λ # Thermal conductivity
     c = property.c # capacity
@@ -42,7 +50,7 @@ end
 function diffusion!(dθ :: AbstractArray{T1}, 
                     θ :: AbstractArray{T2},  
                     heatcuboid :: HeatCuboid, 
-                    property :: StaticIsoProperty, 
+                    property :: StaticIsotropic, 
                     boundary :: CubicBoundary ) where {T1 <: Real, T2 <: Real}
     λ = property.λ # Thermal conductivity
     c = property.c # capacity
@@ -62,7 +70,7 @@ end
 function diffusion!(dθ :: AbstractArray{T1}, 
     θ :: AbstractArray{T2},  
     heatplate :: HeatPlate, 
-    property :: StaticAnisoProperty, 
+    property :: StaticAnisotropic, 
     boundary :: CubicBoundary ) where {T1 <: Real, T2 <: Real}
 
     λx = property.λx # Thermal conductivity in x-direction
@@ -81,7 +89,7 @@ end
 function diffusion!(dθ :: AbstractArray{T1}, 
     θ :: AbstractArray{T2},  
     heatcuboid :: HeatCuboid, 
-    property :: StaticAnisoProperty, 
+    property :: StaticAnisotropic, 
     boundary :: CubicBoundary ) where {T1 <: Real, T2 <: Real}
 
     λx = property.λx # Thermal conductivity in x-direction
@@ -100,7 +108,7 @@ end
 
 
 
-function diffusion_static_x!(dx,x,Nx, Ny, Nz, Δx, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary) # in-place 
+function diffusion_static_x!(dθ,θ,Nx, Ny, Nz, Δx, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary) # in-place 
     α = λ/(c*ρ) # Diffusivity
 
     @inbounds for iz in 1:Nz      
@@ -108,7 +116,7 @@ function diffusion_static_x!(dx,x,Nx, Ny, Nz, Δx, λ :: Real, c :: Real, ρ :: 
             @inbounds for ix in 2 : Nx-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
                 
-                dx[i] = α * (x[i-1] + x[i+1] - 2*x[i])/Δx^2 
+                dθ[i] = α * (θ[i-1] + θ[i+1] - 2*θ[i])/Δx^2 
             end
             i1 = (iz-1)*Nx*Ny + (iy-1)*Nx + 1      # West
             i2 = (iz-1)*Nx*Ny + (iy-1)*Nx + Nx     # East
@@ -116,15 +124,15 @@ function diffusion_static_x!(dx,x,Nx, Ny, Nz, Δx, λ :: Real, c :: Real, ρ :: 
             emission_west = getEmission(boundary, i1, :west)
             emission_east = getEmission(boundary, i2, :east)
     
-            dx[i1] = α * (x[i1+1] - x[i1]) / Δx^2 + emit(x[i1], emission_west)/(c*ρ*Δx)
-            dx[i2] = α * (x[i2-1] - x[i2]) / Δx^2 + emit(x[i2], emission_east)/(c*ρ*Δx)
+            dθ[i1] = α * (θ[i1+1] - θ[i1]) / Δx^2 + emit(θ[i1], emission_west)/(c*ρ*Δx)
+            dθ[i2] = α * (θ[i2-1] - θ[i2]) / Δx^2 + emit(θ[i2], emission_east)/(c*ρ*Δx)
         end
     end
     nothing 
 end
 
 
-function diffusion_static_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary) # in-place
+function diffusion_static_y!(dθ,θ,Nx, Ny, Nz, Δy, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary) # in-place
     α = λ/(c*ρ)
     
     @inbounds for iz in 1:Nz
@@ -132,7 +140,7 @@ function diffusion_static_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Real, c :: Real, ρ :: 
             @inbounds for  iy in 2 : Ny-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
                 
-                dx[i] = dx[i] + α * (x[i-Nx] + x[i+Nx] - 2*x[i])/Δy^2 
+                dθ[i] = dθ[i] + α * (θ[i-Nx] + θ[i+Nx] - 2*θ[i])/Δy^2 
     
             end
             i1 = (iz-1)*Nx*Ny + ix                 # South
@@ -141,17 +149,16 @@ function diffusion_static_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Real, c :: Real, ρ :: 
             emission_south = getEmission(boundary, i1, :south)
             emission_north = getEmission(boundary, i2, :north)
     
-            dx[i1] = dx[i1] + α * (x[i1+Nx] - x[i1]) / Δy^2 + emit(x[i1], emission_south)/(c*ρ*Δy)
-            dx[i2] = dx[i2] + α * (x[i2-Nx] - x[i2]) / Δy^2 + emit(x[i2], emission_north)/(c*ρ*Δy)
+            dθ[i1] = dθ[i1] + α * (θ[i1+Nx] - θ[i1]) / Δy^2 + emit(θ[i1], emission_south)/(c*ρ*Δy)
+            dθ[i2] = dθ[i2] + α * (θ[i2-Nx] - θ[i2]) / Δy^2 + emit(θ[i2], emission_north)/(c*ρ*Δy)
         end
     end
 
     nothing 
 end
 
-function diffusion_static_z!(dx,x,Nx, Ny, Nz, Δz, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary) # in-place
+function diffusion_static_z!(dθ,θ,Nx, Ny, Nz, Δz, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary) # in-place
     α = λ/(c*ρ)
-    
     
     @inbounds for ix in 1 : Nx
         @inbounds for  iy in 1 : Ny
@@ -159,7 +166,7 @@ function diffusion_static_z!(dx,x,Nx, Ny, Nz, Δz, λ :: Real, c :: Real, ρ :: 
 
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
                 
-                dx[i] = dx[i] + α * (x[i-Nx*Ny] + x[i+Nx*Ny] - 2*x[i])/Δz^2 
+                dθ[i] = dθ[i] + α * (θ[i-Nx*Ny] + θ[i+Nx*Ny] - 2*θ[i])/Δz^2 
     
             end
             
@@ -169,8 +176,8 @@ function diffusion_static_z!(dx,x,Nx, Ny, Nz, Δz, λ :: Real, c :: Real, ρ :: 
             emission_underside = getEmission(boundary, i1, :underside)
             emission_topside   = getEmission(boundary, i2, :topside)
     
-            dx[i1] = dx[i1] + α * (x[i1+Nx*Ny] - x[i1]) / Δz^2 + emit(x[i1], emission_underside)/(c*ρ*Δz)
-            dx[i2] = dx[i2] + α * (x[i2-Nx*Ny] - x[i2]) / Δz^2 + emit(x[i2], emission_topside  )/(c*ρ*Δz)
+            dθ[i1] = dθ[i1] + α * (θ[i1+Nx*Ny] - θ[i1]) / Δz^2 + emit(θ[i1], emission_underside)/(c*ρ*Δz)
+            dθ[i2] = dθ[i2] + α * (θ[i2-Nx*Ny] - θ[i2]) / Δz^2 + emit(θ[i2], emission_topside  )/(c*ρ*Δz)
         end
     end
 
@@ -184,7 +191,7 @@ end
 function diffusion!(dθ :: AbstractArray{T1}, 
                     θ :: AbstractArray{T2},  
                     heatrod :: HeatRod, 
-                    property :: DynamicIsoProperty, 
+                    property :: DynamicIsotropic, 
                     boundary :: CubicBoundary ) where {T1 <: Real, T2 <: Real}
     
     λ(x) = specifyproperty(x, property.λ) # thermal conductivity
@@ -201,7 +208,7 @@ end
 function diffusion!(dθ :: AbstractArray{T1}, 
                     θ :: AbstractArray{T2},  
                     heatplate :: HeatPlate, 
-                    property :: DynamicIsoProperty, 
+                    property :: DynamicIsotropic, 
                     boundary :: CubicBoundary ) where {T1 <: Real, T2 <: Real}
    
     λ(x) = specifyproperty(x, property.λ) # thermal conductivity
@@ -218,7 +225,7 @@ end
 function diffusion!(dθ :: AbstractArray{T1}, 
                     θ :: AbstractArray{T2},  
                     heatcuboid :: HeatCuboid, 
-                    property :: DynamicIsoProperty, 
+                    property :: DynamicIsotropic, 
                     boundary :: CubicBoundary ) where {T1 <: Real, T2 <: Real}
    
     λ(x) = specifyproperty(x, property.λ) # thermal conductivity
@@ -239,7 +246,7 @@ end
 function diffusion!(dθ :: AbstractArray{T1}, 
     θ :: AbstractArray{T2},  
     heatplate :: HeatPlate, 
-    property :: DynamicAnisoProperty, 
+    property :: DynamicAnisotropic, 
     boundary :: CubicBoundary ) where {T1 <: Real, T2 <: Real}
 
     λx(x) = specifyproperty(x, property.λx) # thermal conductivity in x-direction
@@ -259,7 +266,7 @@ end
 function diffusion!(dθ :: AbstractArray{T1}, 
     θ :: AbstractArray{T2},  
     heatcuboid :: HeatCuboid, 
-    property :: DynamicAnisoProperty, 
+    property :: DynamicAnisotropic, 
     boundary :: CubicBoundary ) where {T1 <: Real, T2 <: Real}
 
     λx(x) = specifyproperty(x, property.λx) # thermal conductivity in x-direction
@@ -278,28 +285,28 @@ function diffusion!(dθ :: AbstractArray{T1},
 end
 
 
-function diffusion_dynamic_x!(dx,x,Nx, Ny, Nz, Δx, λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary ) # in-place
+function diffusion_dynamic_x!(dθ,θ,Nx, Ny, Nz, Δx, λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary ) # in-place
     
     @inbounds for iz in 1:Nz
         @inbounds for iy in 1 : Ny
             @inbounds for ix in 2 : Nx-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
-                x̅1 =  (x[i-1] + x[i])/2
-                x̅2 =  (x[i+1] + x[i])/2
+                x̅1 =  (θ[i-1] + θ[i])/2
+                x̅2 =  (θ[i+1] + θ[i])/2
                 
-                dx[i] = (λ(x̅1) * x[i-1] + λ(x̅2) * x[i+1] - (λ(x̅1) + λ(x̅2))*x[i])/(Δx^2 * ρ(x[i]) * c(x[i]))
+                dθ[i] = (λ(x̅1) * θ[i-1] + λ(x̅2) * θ[i+1] - (λ(x̅1) + λ(x̅2))*θ[i])/(Δx^2 * ρ(θ[i]) * c(θ[i]))
             end
             i1 = (iz-1)*Nx*Ny + (iy-1)*Nx + 1      # West
             i2 = (iz-1)*Nx*Ny + (iy-1)*Nx + Nx     # East
          
-            x̅1 =  (x[i1] + x[i1+1])/2
-            x̅2 =  (x[i2] + x[i2-1])/2
+            x̅1 =  (θ[i1] + θ[i1+1])/2
+            x̅2 =  (θ[i2] + θ[i2-1])/2
             
             emission_west = getEmission(boundary, i1, :west)
             emission_east = getEmission(boundary, i2, :east)
     
-            dx[i1] = λ(x̅1) * (x[i1+1] - x[i1]) / (Δx^2 * ρ(x[i1]) * c(x[i1])) + emit(x[i1], emission_west)/(Δx * ρ(x[i1]) * c(x[i1]))
-            dx[i2] = λ(x̅2) * (x[i2-1] - x[i2]) / (Δx^2 * ρ(x[i2]) * c(x[i2])) + emit(x[i2], emission_east)/(Δx * ρ(x[i2]) * c(x[i2]))
+            dθ[i1] = λ(x̅1) * (θ[i1+1] - θ[i1]) / (Δx^2 * ρ(θ[i1]) * c(θ[i1])) + emit(θ[i1], emission_west)/(Δx * ρ(θ[i1]) * c(θ[i1]))
+            dθ[i2] = λ(x̅2) * (θ[i2-1] - θ[i2]) / (Δx^2 * ρ(θ[i2]) * c(θ[i2])) + emit(θ[i2], emission_east)/(Δx * ρ(θ[i2]) * c(θ[i2]))
         end
     end
 
@@ -310,27 +317,27 @@ end
 
 
 
-function diffusion_dynamic_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary ) # in-place
+function diffusion_dynamic_y!(dθ,θ,Nx, Ny, Nz, Δy, λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary ) # in-place
     @inbounds for iz in 1:Nz
         @inbounds for ix in 1 : Nx
             @inbounds for  iy in 2 : Ny-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
-                x̅1 =  (x[i-Nx] + x[i])/2
-                x̅2 =  (x[i+Nx] + x[i])/2
-                dx[i] = dx[i] +  (λ(x̅1) * x[i-Nx] + λ(x̅2) * x[i+Nx] - (λ(x̅1) + λ(x̅2))*x[i])/(Δy^2 * ρ(x[i]) * c(x[i]))
+                x̅1 =  (θ[i-Nx] + θ[i])/2
+                x̅2 =  (θ[i+Nx] + θ[i])/2
+                dθ[i] = dθ[i] +  (λ(x̅1) * θ[i-Nx] + λ(x̅2) * θ[i+Nx] - (λ(x̅1) + λ(x̅2))*θ[i])/(Δy^2 * ρ(θ[i]) * c(θ[i]))
     
             end
             i1 = (iz-1)*Nx*Ny + ix                 # South
             i2 = (iz-1)*Nx*Ny + Nx*(Ny-1) + ix     # North
     
-            x̅1 =  (x[i1] + x[i1+Nx])/2
-            x̅2 =  (x[i2] + x[i2-Nx])/2
+            x̅1 =  (θ[i1] + θ[i1+Nx])/2
+            x̅2 =  (θ[i2] + θ[i2-Nx])/2
     
             emission_south = getEmission(boundary, i1, :south)
             emission_north = getEmission(boundary, i2, :north)
     
-            dx[i1] = dx[i1] + λ(x̅1) * (x[i1+Nx] - x[i1]) / (Δy^2 * ρ(x[i1]) * c(x[i1])) + emit(x[i1],emission_south)/ (Δy * ρ(x[i1]) * c(x[i1]))
-            dx[i2] = dx[i2] + λ(x̅2) * (x[i2-Nx] - x[i2]) / (Δy^2 * ρ(x[i2]) * c(x[i2])) + emit(x[i2],emission_north)/ (Δy * ρ(x[i2]) * c(x[i2]))
+            dθ[i1] = dθ[i1] + λ(x̅1) * (θ[i1+Nx] - θ[i1]) / (Δy^2 * ρ(θ[i1]) * c(θ[i1])) + emit(θ[i1],emission_south)/ (Δy * ρ(θ[i1]) * c(θ[i1]))
+            dθ[i2] = dθ[i2] + λ(x̅2) * (θ[i2-Nx] - θ[i2]) / (Δy^2 * ρ(θ[i2]) * c(θ[i2])) + emit(θ[i2],emission_north)/ (Δy * ρ(θ[i2]) * c(θ[i2]))
         end
     end   
 
@@ -340,29 +347,29 @@ end
 
 
 
-function diffusion_dynamic_z!(dx,x,Nx, Ny, Nz, Δz,  λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary) # in-place
+function diffusion_dynamic_z!(dθ,θ,Nx, Ny, Nz, Δz,  λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary) # in-place
     
     @inbounds for ix in 1 : Nx
         @inbounds for  iy in 1 : Ny
             @inbounds for iz in 2:Nz-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
-                x̅1 =  (x[i-Nx*Ny] + x[i])/2
-                x̅2 =  (x[i+Nx*Ny] + x[i])/2
+                x̅1 =  (θ[i-Nx*Ny] + θ[i])/2
+                x̅2 =  (θ[i+Nx*Ny] + θ[i])/2
                 
-                dx[i] = dx[i] +  (λ(x̅1) * x[i-Nx*Ny] + λ(x̅2) * x[i+Nx*Ny] - (λ(x̅1) + λ(x̅2))*x[i])/(Δz^2 * ρ(x[i]) * c(x[i]))
+                dθ[i] = dθ[i] +  (λ(x̅1) * θ[i-Nx*Ny] + λ(x̅2) * θ[i+Nx*Ny] - (λ(x̅1) + λ(x̅2))*θ[i])/(Δz^2 * ρ(θ[i]) * c(θ[i]))
             end
             
             i1 = (iy-1)*Nx + ix                 # Underside
             i2 = (Nz-1)*Nx*Ny + (iy-1)*Nx + ix  # Topside
             
-            x̅1 =  (x[i1] + x[i1+Nx])/2
-            x̅2 =  (x[i2] + x[i2-Nx])/2
+            x̅1 =  (θ[i1] + θ[i1+Nx])/2
+            x̅2 =  (θ[i2] + θ[i2-Nx])/2
 
             emission_underside = getEmission(boundary, i1, :underside)
             emission_topside   = getEmission(boundary, i2, :topside  )
     
-            dx[i1] = dx[i1] + λ(x̅1) * (x[i1+Nx*Ny] - x[i1]) / (Δz^2 * ρ(x[i1]) * c(x[i1])) + emit(x[i1],emission_underside)/ (Δz * ρ(x[i1]) * c(x[i1]))
-            dx[i2] = dx[i2] + λ(x̅2) * (x[i2-Nx*Ny] - x[i2]) / (Δz^2 * ρ(x[i2]) * c(x[i2])) + emit(x[i2],emission_topside  )/ (Δz * ρ(x[i2]) * c(x[i2]))
+            dθ[i1] = dθ[i1] + λ(x̅1) * (θ[i1+Nx*Ny] - θ[i1]) / (Δz^2 * ρ(θ[i1]) * c(θ[i1])) + emit(θ[i1],emission_underside)/ (Δz * ρ(θ[i1]) * c(θ[i1]))
+            dθ[i2] = dθ[i2] + λ(x̅2) * (θ[i2-Nx*Ny] - θ[i2]) / (Δz^2 * ρ(θ[i2]) * c(θ[i2])) + emit(θ[i2],emission_topside  )/ (Δz * ρ(θ[i2]) * c(θ[i2]))
         end
     end
 
@@ -374,7 +381,7 @@ end
 function diffusion!(dθ :: AbstractArray{T1}, 
                     θ :: AbstractArray{T2},  
                     heatrod :: HeatRod, 
-                    property :: StaticIsoProperty, 
+                    property :: StaticIsotropic, 
                     boundary :: CubicBoundary,  
                     actuation :: AbstractIOSetup, 
                     input_signals :: AbstractArray{T3} ) where {T1 <: Real, T2 <: Real, T3 <: Real}
@@ -394,7 +401,7 @@ end
 function diffusion!(dθ :: AbstractArray{T1}, 
                         θ :: AbstractArray{T2},  
                         heatplate :: HeatPlate, 
-                        property :: StaticIsoProperty, 
+                        property :: StaticIsotropic, 
                         boundary :: CubicBoundary,  
                         actuation :: AbstractIOSetup, 
                         input_signals :: AbstractArray{T3} ) where {T1 <: Real, T2 <: Real, T3 <: Real}
@@ -413,7 +420,7 @@ end
 function diffusion!(dθ :: AbstractArray{T1}, 
                         θ :: AbstractArray{T2},  
                         heatcuboid :: HeatCuboid, 
-                        property :: StaticIsoProperty, 
+                        property :: StaticIsotropic, 
                         boundary :: CubicBoundary,
                         actuation :: AbstractIOSetup, 
                         input_signals :: AbstractArray{T3} ) where {T1 <: Real, T2 <: Real, T3 <: Real}
@@ -433,7 +440,7 @@ end
 function diffusion!(dθ :: AbstractArray{T1}, 
     θ :: AbstractArray{T2},  
     heatplate :: HeatPlate, 
-    property :: StaticAnisoProperty, 
+    property :: StaticAnisotropic, 
     boundary :: CubicBoundary,  
     actuation :: AbstractIOSetup, 
     input_signals :: AbstractArray{T3} ) where {T1 <: Real, T2 <: Real, T3 <: Real}
@@ -453,7 +460,7 @@ end
 function diffusion!(dθ :: AbstractArray{T1}, 
     θ :: AbstractArray{T2},  
     heatcuboid :: HeatCuboid, 
-    property :: StaticAnisoProperty, 
+    property :: StaticAnisotropic, 
     boundary :: CubicBoundary,
     actuation :: AbstractIOSetup, 
     input_signals :: AbstractArray{T3} ) where {T1 <: Real, T2 <: Real, T3 <: Real}
@@ -475,7 +482,7 @@ end
 
 
 
-function diffusion_static_x!(dx, x, Nx, Ny, Nz, Δx, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real  # in-place 
+function diffusion_static_x!(dθ, θ, Nx, Ny, Nz, Δx, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real  # in-place 
     α = λ/(c*ρ) # Diffusivity
 
     @inbounds for iz in 1:Nz
@@ -483,7 +490,7 @@ function diffusion_static_x!(dx, x, Nx, Ny, Nz, Δx, λ :: Real, c :: Real, ρ :
             @inbounds for ix in 2 : Nx-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
                 
-                dx[i] = α * (x[i-1] + x[i+1] - 2*x[i])/Δx^2 
+                dθ[i] = α * (θ[i-1] + θ[i+1] - 2*θ[i])/Δx^2 
             end
             i1 = (iz-1)*Nx*Ny + (iy-1)*Nx + 1      # West
             i2 = (iz-1)*Nx*Ny + (iy-1)*Nx + Nx     # East
@@ -497,8 +504,8 @@ function diffusion_static_x!(dx, x, Nx, Ny, Nz, Δx, λ :: Real, c :: Real, ρ :
             ϕin_west = char_west * input_signals[in_idx_west]
             ϕin_east = char_east * input_signals[in_idx_east]
 
-            dx[i1] = α * (x[i1+1] - x[i1]) / Δx^2 + (emit(x[i1], emission_west) + ϕin_west)/(c*ρ*Δx)
-            dx[i2] = α * (x[i2-1] - x[i2]) / Δx^2 + (emit(x[i2], emission_east) + ϕin_east)/(c*ρ*Δx)
+            dθ[i1] = α * (θ[i1+1] - θ[i1]) / Δx^2 + (emit(θ[i1], emission_west) + ϕin_west)/(c*ρ*Δx)
+            dθ[i2] = α * (θ[i2-1] - θ[i2]) / Δx^2 + (emit(θ[i2], emission_east) + ϕin_east)/(c*ρ*Δx)
         end
     end
     nothing 
@@ -506,7 +513,7 @@ end
 
 
 
-function diffusion_static_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real # in-place
+function diffusion_static_y!(dθ,θ,Nx, Ny, Nz, Δy, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real # in-place
     α = λ/(c*ρ)
     
     @inbounds for iz in 1:Nz
@@ -514,7 +521,7 @@ function diffusion_static_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Real, c :: Real, ρ :: 
             @inbounds for  iy in 2 : Ny-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
                 
-                dx[i] = dx[i] + α * (x[i-Nx] + x[i+Nx] - 2*x[i])/Δy^2 
+                dθ[i] = dθ[i] + α * (θ[i-Nx] + θ[i+Nx] - 2*θ[i])/Δy^2 
     
             end
             i1 = (iz-1)*Nx*Ny + ix                 # South
@@ -529,15 +536,15 @@ function diffusion_static_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Real, c :: Real, ρ :: 
             ϕin_south = char_south * input_signals[in_idx_south]
             ϕin_north = char_north * input_signals[in_idx_north]
 
-            dx[i1] = dx[i1] + α * (x[i1+Nx] - x[i1]) / Δy^2 + (emit(x[i1], emission_south) + ϕin_south)/(c*ρ*Δy)
-            dx[i2] = dx[i2] + α * (x[i2-Nx] - x[i2]) / Δy^2 + (emit(x[i2], emission_north) + ϕin_north)/(c*ρ*Δy)
+            dθ[i1] = dθ[i1] + α * (θ[i1+Nx] - θ[i1]) / Δy^2 + (emit(θ[i1], emission_south) + ϕin_south)/(c*ρ*Δy)
+            dθ[i2] = dθ[i2] + α * (θ[i2-Nx] - θ[i2]) / Δy^2 + (emit(θ[i2], emission_north) + ϕin_north)/(c*ρ*Δy)
         end
     end
 
     nothing 
 end
 
-function diffusion_static_z!(dx,x,Nx, Ny, Nz, Δz, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real # in-place
+function diffusion_static_z!(dθ,θ,Nx, Ny, Nz, Δz, λ :: Real, c :: Real, ρ :: Real, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real # in-place
     α = λ/(c*ρ)
     
     
@@ -547,7 +554,7 @@ function diffusion_static_z!(dx,x,Nx, Ny, Nz, Δz, λ :: Real, c :: Real, ρ :: 
 
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
                 
-                dx[i] = dx[i] + α * (x[i-Nx*Ny] + x[i+Nx*Ny] - 2*x[i])/Δz^2 
+                dθ[i] = dθ[i] + α * (θ[i-Nx*Ny] + θ[i+Nx*Ny] - 2*θ[i])/Δz^2 
     
             end
             
@@ -564,8 +571,8 @@ function diffusion_static_z!(dx,x,Nx, Ny, Nz, Δz, λ :: Real, c :: Real, ρ :: 
             ϕin_topside   = char_topside   * input_signals[in_idx_topside]
 
 
-            dx[i1] = dx[i1] + α * (x[i1+Nx*Ny] - x[i1]) / Δz^2 + (emit(x[i1], emission_underside) + ϕin_underside)/(c*ρ*Δz)
-            dx[i2] = dx[i2] + α * (x[i2-Nx*Ny] - x[i2]) / Δz^2 + (emit(x[i2], emission_topside  ) + ϕin_topside  )/(c*ρ*Δz)
+            dθ[i1] = dθ[i1] + α * (θ[i1+Nx*Ny] - θ[i1]) / Δz^2 + (emit(θ[i1], emission_underside) + ϕin_underside)/(c*ρ*Δz)
+            dθ[i2] = dθ[i2] + α * (θ[i2-Nx*Ny] - θ[i2]) / Δz^2 + (emit(θ[i2], emission_topside  ) + ϕin_topside  )/(c*ρ*Δz)
         end
     end
 
@@ -579,7 +586,7 @@ end
 function diffusion!(dθ :: AbstractArray{T1}, 
                     θ :: AbstractArray{T2},  
                     heatrod :: HeatRod, 
-                    property :: DynamicIsoProperty, 
+                    property :: DynamicIsotropic, 
                     boundary :: CubicBoundary ,  
                     actuation :: AbstractIOSetup, 
                     input_signals :: AbstractArray{T3} ) where {T1 <: Real, T2 <: Real, T3 <: Real}
@@ -598,7 +605,7 @@ end
 function diffusion!(dθ :: AbstractArray{T1}, 
                     θ :: AbstractArray{T2},  
                     heatplate :: HeatPlate, 
-                    property :: DynamicIsoProperty, 
+                    property :: DynamicIsotropic, 
                     boundary :: CubicBoundary,
                     actuation :: AbstractIOSetup, 
                     input_signals :: AbstractArray{T3} ) where {T1 <: Real, T2 <: Real, T3 <: Real}
@@ -617,7 +624,7 @@ end
 function diffusion!(dθ :: AbstractArray{T1}, 
                     θ :: AbstractArray{T2},  
                     heatcuboid :: HeatCuboid, 
-                    property :: DynamicIsoProperty, 
+                    property :: DynamicIsotropic, 
                     boundary :: CubicBoundary,
                     actuation :: AbstractIOSetup, 
                     input_signals :: AbstractArray{T3} ) where {T1 <: Real, T2 <: Real, T3 <: Real}
@@ -640,7 +647,7 @@ end
 function diffusion!(dθ :: AbstractArray{T1}, 
     θ :: AbstractArray{T2},  
     heatplate :: HeatPlate, 
-    property :: DynamicAnisoProperty, 
+    property :: DynamicAnisotropic, 
     boundary :: CubicBoundary,
     actuation :: AbstractIOSetup, 
     input_signals :: AbstractArray{T3} ) where {T1 <: Real, T2 <: Real, T3 <: Real}
@@ -661,7 +668,7 @@ end
 function diffusion!(dθ :: AbstractArray{T1}, 
     θ :: AbstractArray{T2},  
     heatcuboid :: HeatCuboid, 
-    property :: DynamicAnisoProperty, 
+    property :: DynamicAnisotropic, 
     boundary :: CubicBoundary,
     actuation :: AbstractIOSetup, 
     input_signals :: AbstractArray{T3} ) where {T1 <: Real, T2 <: Real, T3 <: Real}
@@ -684,22 +691,22 @@ end
 
 
 
-function diffusion_dynamic_x!(dx,x,Nx, Ny, Nz, Δx, λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real 
+function diffusion_dynamic_x!(dθ,θ,Nx, Ny, Nz, Δx, λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real 
     
     @inbounds for iz in 1:Nz
         @inbounds for iy in 1 : Ny
             @inbounds for ix in 2 : Nx-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
-                x̅1 =  (x[i-1] + x[i])/2
-                x̅2 =  (x[i+1] + x[i])/2
+                x̅1 =  (θ[i-1] + θ[i])/2
+                x̅2 =  (θ[i+1] + θ[i])/2
                 
-                dx[i] = (λ(x̅1) * x[i-1] + λ(x̅2) * x[i+1] - (λ(x̅1) + λ(x̅2))*x[i])/(Δx^2 * ρ(x[i]) * c(x[i]))
+                dθ[i] = (λ(x̅1) * θ[i-1] + λ(x̅2) * θ[i+1] - (λ(x̅1) + λ(x̅2))*θ[i])/(Δx^2 * ρ(θ[i]) * c(θ[i]))
             end
             i1 = (iz-1)*Nx*Ny + (iy-1)*Nx + 1      # West
             i2 = (iz-1)*Nx*Ny + (iy-1)*Nx + Nx     # East
          
-            x̅1 =  (x[i1] + x[i1+1])/2
-            x̅2 =  (x[i2] + x[i2-1])/2
+            x̅1 =  (θ[i1] + θ[i1+1])/2
+            x̅2 =  (θ[i2] + θ[i2-1])/2
             
             emission_west = getEmission(boundary, i1, :west)
             emission_east = getEmission(boundary, i2, :east)
@@ -710,8 +717,8 @@ function diffusion_dynamic_x!(dx,x,Nx, Ny, Nz, Δx, λ :: Function, c :: Functio
             ϕin_west = char_west * input_signals[in_idx_west]
             ϕin_east = char_east * input_signals[in_idx_east]
 
-            dx[i1] = λ(x̅1) * (x[i1+1] - x[i1]) / (Δx^2 * ρ(x[i1]) * c(x[i1])) + (emit(x[i1], emission_west) + ϕin_west)/(Δx * ρ(x[i1]) * c(x[i1]))
-            dx[i2] = λ(x̅2) * (x[i2-1] - x[i2]) / (Δx^2 * ρ(x[i2]) * c(x[i2])) + (emit(x[i2], emission_east) + ϕin_east)/(Δx * ρ(x[i2]) * c(x[i2]))
+            dθ[i1] = λ(x̅1) * (θ[i1+1] - θ[i1]) / (Δx^2 * ρ(θ[i1]) * c(θ[i1])) + (emit(θ[i1], emission_west) + ϕin_west)/(Δx * ρ(θ[i1]) * c(θ[i1]))
+            dθ[i2] = λ(x̅2) * (θ[i2-1] - θ[i2]) / (Δx^2 * ρ(θ[i2]) * c(θ[i2])) + (emit(θ[i2], emission_east) + ϕin_east)/(Δx * ρ(θ[i2]) * c(θ[i2]))
         end
     end
 
@@ -722,24 +729,24 @@ end
 
 
 
-function diffusion_dynamic_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real 
+function diffusion_dynamic_y!(dθ,θ,Nx, Ny, Nz, Δy, λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real 
     @inbounds for iz in 1:Nz
         @inbounds for ix in 1 : Nx
             @inbounds for  iy in 2 : Ny-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
     
     
-                x̅1 =  (x[i-Nx] + x[i])/2
-                x̅2 =  (x[i+Nx] + x[i])/2
+                x̅1 =  (θ[i-Nx] + θ[i])/2
+                x̅2 =  (θ[i+Nx] + θ[i])/2
                 
-                dx[i] = dx[i] +  (λ(x̅1) * x[i-Nx] + λ(x̅2) * x[i+Nx] - (λ(x̅1) + λ(x̅2))*x[i])/(Δy^2 * ρ(x[i]) * c(x[i]))
+                dθ[i] = dθ[i] +  (λ(x̅1) * θ[i-Nx] + λ(x̅2) * θ[i+Nx] - (λ(x̅1) + λ(x̅2))*θ[i])/(Δy^2 * ρ(θ[i]) * c(θ[i]))
     
             end
             i1 = (iz-1)*Nx*Ny + ix                 # South
             i2 = (iz-1)*Nx*Ny + Nx*(Ny-1) + ix     # North
     
-            x̅1 =  (x[i1] + x[i1+Nx])/2
-            x̅2 =  (x[i2] + x[i2-Nx])/2
+            x̅1 =  (θ[i1] + θ[i1+Nx])/2
+            x̅2 =  (θ[i2] + θ[i2-Nx])/2
     
             emission_south = getEmission(boundary, i1, :south)
             emission_north = getEmission(boundary, i2, :north)
@@ -750,8 +757,8 @@ function diffusion_dynamic_y!(dx,x,Nx, Ny, Nz, Δy, λ :: Function, c :: Functio
             ϕin_south = char_south * input_signals[in_idx_south]
             ϕin_north = char_north * input_signals[in_idx_north]
 
-            dx[i1] = dx[i1] + λ(x̅1) * (x[i1+Nx] - x[i1]) / (Δy^2 * ρ(x[i1]) * c(x[i1])) + (emit(x[i1],emission_south) + ϕin_south)/ (Δy * ρ(x[i1]) * c(x[i1]))
-            dx[i2] = dx[i2] + λ(x̅2) * (x[i2-Nx] - x[i2]) / (Δy^2 * ρ(x[i2]) * c(x[i2])) + (emit(x[i2],emission_north) + ϕin_north)/ (Δy * ρ(x[i2]) * c(x[i2]))
+            dθ[i1] = dθ[i1] + λ(x̅1) * (θ[i1+Nx] - θ[i1]) / (Δy^2 * ρ(θ[i1]) * c(θ[i1])) + (emit(θ[i1],emission_south) + ϕin_south)/ (Δy * ρ(θ[i1]) * c(θ[i1]))
+            dθ[i2] = dθ[i2] + λ(x̅2) * (θ[i2-Nx] - θ[i2]) / (Δy^2 * ρ(θ[i2]) * c(θ[i2])) + (emit(θ[i2],emission_north) + ϕin_north)/ (Δy * ρ(θ[i2]) * c(θ[i2]))
         end
     end   
 
@@ -761,23 +768,23 @@ end
 
 
 
-function diffusion_dynamic_z!(dx,x,Nx, Ny, Nz, Δz,  λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real 
+function diffusion_dynamic_z!(dθ,θ,Nx, Ny, Nz, Δz,  λ :: Function, c :: Function, ρ :: Function, boundary :: CubicBoundary, actuation :: AbstractIOSetup, input_signals :: AbstractArray{T}) where T <: Real 
     
     @inbounds for ix in 1 : Nx
         @inbounds for  iy in 1 : Ny
             @inbounds for iz in 2:Nz-1
                 i = (iz-1)*Nx*Ny + (iy-1)*Nx + ix
-                x̅1 =  (x[i-Nx*Ny] + x[i])/2
-                x̅2 =  (x[i+Nx*Ny] + x[i])/2
+                x̅1 =  (θ[i-Nx*Ny] + θ[i])/2
+                x̅2 =  (θ[i+Nx*Ny] + θ[i])/2
                 
-                dx[i] = dx[i] +  (λ(x̅1) * x[i-Nx*Ny] + λ(x̅2) * x[i+Nx*Ny] - (λ(x̅1) + λ(x̅2))*x[i])/(Δz^2 * ρ(x[i]) * c(x[i]))
+                dθ[i] = dθ[i] +  (λ(x̅1) * θ[i-Nx*Ny] + λ(x̅2) * θ[i+Nx*Ny] - (λ(x̅1) + λ(x̅2))*θ[i])/(Δz^2 * ρ(θ[i]) * c(θ[i]))
             end
             
             i1 = (iy-1)*Nx + ix                 # Underside
             i2 = (Nz-1)*Nx*Ny + (iy-1)*Nx + ix  # Topside
             
-            x̅1 =  (x[i1] + x[i1+Nx])/2
-            x̅2 =  (x[i2] + x[i2-Nx])/2
+            x̅1 =  (θ[i1] + θ[i1+Nx])/2
+            x̅2 =  (θ[i2] + θ[i2-Nx])/2
 
             emission_underside = getEmission(boundary, i1, :underside)
             emission_topside   = getEmission(boundary, i2, :topside  )
@@ -789,12 +796,10 @@ function diffusion_dynamic_z!(dx,x,Nx, Ny, Nz, Δz,  λ :: Function, c :: Functi
             ϕin_topside   = char_topside   * input_signals[in_idx_topside]
 
     
-            dx[i1] = dx[i1] + λ(x̅1) * (x[i1+Nx*Ny] - x[i1]) / (Δz^2 * ρ(x[i1]) * c(x[i1])) + (emit(x[i1],emission_underside) + ϕin_underside)/ (Δz * ρ(x[i1]) * c(x[i1]))
-            dx[i2] = dx[i2] + λ(x̅2) * (x[i2-Nx*Ny] - x[i2]) / (Δz^2 * ρ(x[i2]) * c(x[i2])) + (emit(x[i2],emission_topside)   + ϕin_topside  )/ (Δz * ρ(x[i2]) * c(x[i2]))
+            dθ[i1] = dθ[i1] + λ(x̅1) * (θ[i1+Nx*Ny] - θ[i1]) / (Δz^2 * ρ(θ[i1]) * c(θ[i1])) + (emit(θ[i1],emission_underside) + ϕin_underside)/ (Δz * ρ(θ[i1]) * c(θ[i1]))
+            dθ[i2] = dθ[i2] + λ(x̅2) * (θ[i2-Nx*Ny] - θ[i2]) / (Δz^2 * ρ(θ[i2]) * c(θ[i2])) + (emit(θ[i2],emission_topside)   + ϕin_topside  )/ (Δz * ρ(θ[i2]) * c(θ[i2]))
         end
     end
 
     nothing 
 end
-
-

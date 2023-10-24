@@ -15,15 +15,17 @@ makedocs(;
     ),
     pages=Any[
        "Hestia.jl" => "index.md",
-       "Theory" => Any[
-         "theory/geometry_material.md",
-         "theory/boundary_conditions.md",
-         "theory/actuators.md"
-         ],
+       "Getting Started" => "getting_started.md",
        "Tutorials" => Any[
          "examples/rod_1d.md",
          "examples/plate_2d.md"
         ], 
+        "Theory" => Any[
+         "theory/geometry_boundary.md",
+         "theory/material_properties.md",
+         "theory/boundary_conditions.md",
+         "theory/actuators_sensors.md"
+         ],
    	    "Components" => "components.md"
     ],
 )

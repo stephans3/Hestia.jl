@@ -6,7 +6,12 @@ mutable struct IOSetup <: AbstractIOSetup
     character :: Dict{Symbol, Vector{Real}}    # Configuration / characterization
 end
 
-function initIOSetup(geometry :: AbstractGeometricalObject)
+"""
+    IOSetup(geometry :: AbstractGeometricalObject)
+
+Initialize IOSetup as basic element for actuation and sensing.
+"""
+function IOSetup(geometry :: AbstractGeometricalObject)
 
     position_symbols = getboundarypositions( geometry )
     
@@ -35,7 +40,7 @@ function setIOSetup!(iosetup :: IOSetup, heatrod :: HeatRod, identifier_index ::
     elseif orientation == :east
         iosetup.indices[orientation]  = [num_cells];
     end
-
+    return nothing
 end
 
 
@@ -50,7 +55,6 @@ function setIOSetup!(iosetup :: IOSetup, heatplate :: HeatPlate, num_partitions 
     end
 
     setIOSetup!(iosetup , heatplate, partition_array, config_array,  orientation)
-
 end
 
 function setIOSetup!(iosetup :: IOSetup, heatplate :: HeatPlate, partition :: Vector{T} where T <: Integer, config :: Array{RadialConfiguration,1},  orientation :: Symbol)
@@ -58,7 +62,6 @@ function setIOSetup!(iosetup :: IOSetup, heatplate :: HeatPlate, partition :: Ve
     if size(partition) != size(config)
         error("Size of partition and configuration array have to be equal!")
     end
-
 
     if orientation == :south || orientation == :north
         step        = heatplate.sampling[1]
@@ -77,11 +80,10 @@ function setIOSetup!(iosetup :: IOSetup, heatplate :: HeatPlate, partition :: Ve
     centralpoints = findcenterpoints(heatplate, num_partitions, orientation) 
 
     if length(cellindices) < num_partitions 
-        error("Number of partitions higher than number of cells! Partitions: $(num_partitions), Cells: $(length(cellindices)). \n You may change the size of partition and configuration array.")    end
-
+        error("Number of partitions higher than number of cells! Partitions: $(num_partitions), Cells: $(length(cellindices)). \n You may change the size of partition and configuration array.")    
+    end
 
     partitionrange = length(cellindices)/num_partitions;
-
    
     span = step/2 : step : distance - (step/2)
     stop_idx = 0;
@@ -104,9 +106,7 @@ function setIOSetup!(iosetup :: IOSetup, heatplate :: HeatPlate, partition :: Ve
             config[i].center = point
             
             spatial_character  = characterize(span[start_idx],span[stop_idx], step, config[i], dim=dim_index)
-
             identifier_index = partition[i]*ones(Int64, length(spatial_character))
-
 
             indices = vcat(indices, cellindices[partitionindices])
             chars = vcat(chars, spatial_character);
@@ -117,6 +117,8 @@ function setIOSetup!(iosetup :: IOSetup, heatplate :: HeatPlate, partition :: Ve
     iosetup.identifier[orientation] = idents;
     iosetup.character[orientation] = chars;
     iosetup.indices[orientation] = indices;
+
+    return nothing
 end
 
 
@@ -135,7 +137,6 @@ function setIOSetup!(iosetup :: IOSetup, heatcuboid :: HeatCuboid, num_partition
             partition_array[ix,iy] = ix + (iy-1)*num_actuators_row  + (start_index-1)
         end
     end
-
 
     setIOSetup!(iosetup , heatcuboid, partition_array, config_array,  orientation)
 end
@@ -194,23 +195,17 @@ function setIOSetup!(iosetup :: IOSetup, heatcuboid :: HeatCuboid, partition :: 
         error("Number of column partitions higher than number of column cells! Partitions: $(num_parts_cols), Cells: $(num_cells_col). \n You may change the size of partition and configuration array.")
     end
 
-
-
     cellindices = getindices(heatcuboid, cellPosition = orientation) 
     cellindices = reshape(cellindices, num_cells_row, num_cells_col)
-
-
 
     partitionrange = zeros(2)
     partitionrange[1] = num_cells_row/num_parts_rows;
     partitionrange[2] = num_cells_col/num_parts_cols;
-
    
     span_row = step[1]/2 : step[1] : distance[1] - (step[1]/2)
     span_col = step[2]/2 : step[2] : distance[2] - (step[2]/2)
-    
-    
-    stop_idx = 0;
+        
+    # stop_idx = 0;
 
     indices = Int64[]
     chars   = Real[]
@@ -249,7 +244,7 @@ function setIOSetup!(iosetup :: IOSetup, heatcuboid :: HeatCuboid, partition :: 
     iosetup.identifier[orientation] = idents;
     iosetup.character[orientation] = chars;
     iosetup.indices[orientation] = indices;
-
+    return nothing
 end
 
 #=
@@ -452,12 +447,17 @@ end
 
 
 """
+    measure(temperatures :: Vector{<:Real}, character :: Vector{<:Real})
 Returns the weighted arithmetic mean of the measurement.
 """
-function measureWAM(temperatures :: Vector{T1}, character :: Vector{T2}) where {T1 <: Real, T2 <: Real}
+function measure(temperatures :: Vector{<:Real}, character :: Vector{<:Real})
     return character' * temperatures / sum(character)
 end
 
-function measureWAM(temperatures :: Array{T1,2}, character :: Vector{T2}) where {T1 <: Real, T2 <: Real}
+"""
+    measure(temperatures :: Matrix{<:Real}, character :: Vector{<:Real})
+Returns the weighted arithmetic mean of the measurement.
+"""
+function measure(temperatures :: Matrix{<:Real}, character :: Vector{<:Real})
     return transpose(character' * temperatures / sum(character))
 end
