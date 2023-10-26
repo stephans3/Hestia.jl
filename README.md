@@ -34,29 +34,22 @@ Simulation of heat conduction problems in multiple dimensions with boundary cont
 * supply heat via actuators like heating elements
 * measure surface temperature
 
-The documentation will be updated soon.
-
-For examples are listed in folder [**examples**](https://github.com/stephans3/Hestia.jl/tree/master/examples).
 
 ## Tutorials and Examples 
 
 Tutorials can be found in the [docs](https://stephans3.github.io/Hestia.jl/dev).
 
-You are interest in more examples?
-Come and visit our HestiaModelZoo!
+You are interest in discovering more examples?
+Come and visit our [HestiaModelZoo](https://github.com/stephans3/HestiaModelZoo.jl)!
 
 
 <img src="https://raw.githubusercontent.com/stephans3/Hestia.jl/master/docs/assets/plate_2d_animation.gif" width="450" height="300">
-
 
 ## Alternatives
 If you look for general purpose approaches to simulate heat conduction, you may also take a look on
 - [Trixi.jl](https://github.com/trixi-framework/Trixi.jl/)
 - [Gridap.jl](https://github.com/gridap/Gridap.jl)
 - [VoronoiFVM.jl](https://github.com/j-fu/VoronoiFVM.jl)
-
-
-
 
 # How to cite
 If you use Hestia.jl in your own research, please cite the following article:
