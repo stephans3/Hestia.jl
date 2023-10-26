@@ -1,12 +1,12 @@
-abstract type AbstractConfiguration end
-abstract type AbstractStaticConfiguration <: AbstractConfiguration end
+abstract type AbstractCharacteristics end
+abstract type AbstractStaticCharacteristics <: AbstractCharacteristics end
 
 abstract type AbstractCharacterization end
 
 
 # m * exp( -||M (x - xₛ)||^ν )
 """
-    RadialConfiguration <: AbstractStaticConfiguration
+    RadialCharacteristics <: AbstractStaticCharacteristics
 
 Stores the values for the calculation of ``m ~ exp( -||M (x - xₛ)||^{2ν} )``
 
@@ -18,37 +18,50 @@ Stores the values for the calculation of ``m ~ exp( -||M (x - xₛ)||^{2ν} )``
     
 `curvature` : M ∈ R^{3 x 3} for the planar boundaries
 """
-mutable struct RadialConfiguration <: AbstractStaticConfiguration
+mutable struct RadialCharacteristics <: AbstractStaticCharacteristics
 
     scaling     :: Real                         # Scaling factor:      m  ∈ [0, 1]
     power       :: Integer                      # Power of exponent :  ν  ∈ [0, ∞)
     center      :: Tuple{Real,Real,Real}        # Central point:       xₛ ∈ R^{3}
     curvature   :: Matrix{T} where T <: Real    # Curvature matrix:    M  ∈ R^{3 x 3} for the planar boundaries
+
+    function RadialCharacteristics(scale, power, center, curvature)
+        if scale < 0 || scale > 1
+            println( "Scale = $(scale) is not in interval [0,1]! Scale is set to 1!" )
+            scale = eltype(scale)(1)
+        end
+    
+        if size(curvature) != (3,3)
+            error("Variable curvature has to be a scalar or a 3x3 matrix. curvature = $(curvature)")
+        end
+        new(scale, power, center, curvature)
+    end
+
 end
 
 
 
 """
-    initConfiguration()
+    RadialCharacteristics()
 
-Initializes and returns a basic `RadialConfiguration`
+Initializes and returns a basic `RadialCharacteristics`
 """
-function initConfiguration()
+function RadialCharacteristics()
     scale = 1.0
     power = 1
     center = (0.0, 0.0, 0.0)
     curvature = 0.0
 
-    return setConfiguration(scale, power, center, curvature) 
+    return setCharacteristics(scale, power, center, curvature) 
 end
 
 
 """
-    setConfiguration( scale :: Real , power :: Integer, curvature :: Real)
+    RadialCharacteristics( scale :: Real , power :: Integer, curvature :: Real)
 
-    The center is set to the origin (0,0,0).
+The center is set to the origin (0,0,0).
 """
-function setConfiguration( scale :: Real , power :: Integer, curvature :: Real)
+function RadialCharacteristics( scale :: Real , power :: Integer, curvature :: Real)
 
     if scale < 0 || scale > 1
         println( "Scale = $(scale) is not in interval [0,1]! Scale is set to 1!" )
@@ -57,66 +70,43 @@ function setConfiguration( scale :: Real , power :: Integer, curvature :: Real)
     central_point = (0.0, 0.0, 0.0);
     curvature = curvature * [1 0 0; 0 1 0; 0 0 1];
 
-    return RadialConfiguration(scale, power, central_point, curvature)
+    return RadialCharacteristics(scale, power, central_point, curvature)
 end
 
 
 """
-    setConfiguration( scale :: Real , power :: Integer; curvature = 1.0 :: Real)
+    RadialCharacteristics( scale :: Real , power :: Integer, curvature :: Matrix{<: Real} )
 
-    The center is set to the origin (0,0,0).
+The center is set to the origin (0,0,0).
 """
-function setConfiguration( scale :: Real , power :: Integer, curvature :: Matrix{T} where T <: Real)
+function RadialCharacteristics( scale :: Real , power :: Integer, curvature :: Matrix{<: Real} )
 
     if scale < 0 || scale > 1
         println( "Scale = $(scale) is not in interval [0,1]! Scale is set to 1!" )
         scale = eltype(scale)(1)
     end
-    central_point = (0.0, 0.0, 0.0);
+    center = (0.0, 0.0, 0.0);
 
-    return RadialConfiguration(scale, power, central_point, curvature)
+    return RadialCharacteristics(scale, power, center, curvature)
 end
 
 """
-    setConfiguration( scale :: Real , power :: Integer, central_point :: Tuple{Real,Real,Real}, curvature :: Real)
+    RadialCharacteristics( scale :: Real , power :: Integer, central_point :: Tuple{Real,Real,Real}, curvature :: Real)
 
 Here the variable `curvature` is multiplied with the identity matrix to gain matrix `M`.
 
-Returns a `RadialConfiguration`
+Returns a `RadialCharacteristics`.
 """
-function setConfiguration( scale :: Real , power :: Integer, central_point :: Tuple{Real,Real,Real}, curvature :: Real)
+function RadialCharacteristics( scale :: Real , power :: Integer, center :: Tuple{Real,Real,Real}, curvature :: Real)
 
     if scale < 0 || scale > 1
         println( "Scale = $(scale) is not in interval [0,1]! Scale is set to 1!" )
         scale = eltype(scale)(1)
     end
-
     curvature = curvature * [1 0 0; 0 1 0; 0 0 1];
-
-    return RadialConfiguration(scale, power, central_point, curvature)
+    
+    return RadialCharacteristics(scale, power, center, curvature)
 end
-
-
-"""
-    setConfiguration( scale :: Real , power :: Integer, central_point :: Tuple{Real,Real,Real}, curvature :: Array{T,2} where T <: Real)
-
-Returns a `RadialConfiguration`
-"""
-function setConfiguration( scale :: Real , power :: Integer, central_point :: Tuple{Real,Real,Real}, curvature :: Matrix{T} where T <: Real)
-
-    if scale < 0 || scale > 1
-        println( "Scale = $(scale) is not in interval [0,1]! Scale is set to 1!" )
-        scale = eltype(scale)(1)
-    end
-
-    if size(curvature) != (3,3)
-        error("Variable curvature has to be a scalar or a 3x3 matrix. curvature = $(curvature)")
-    end
-
-    return RadialConfiguration(scale, power, central_point, curvature)
-end
-
-
 
 function characterize(start :: T, stop :: T, step :: T, uniscale :: S) where {T <: Real, S <: Real}
     if !(0 <= uniscale <= 1)
@@ -130,7 +120,7 @@ function characterize(start :: T, stop :: T, step :: T, uniscale :: S) where {T 
 end
 
 """
-    characterize(start :: Real, stop :: Real, step :: Real, config :: RadialConfiguration; dim = 1 :: Integer )
+    characterize(start :: Real, stop :: Real, step :: Real, config :: RadialCharacteristics; dim = 1 :: Integer )
 
 x₁: dim = 1
 
@@ -138,7 +128,7 @@ x₂: dim = 2
 
 x₃: dim = 3
 """
-function characterize(start :: Real, stop :: Real, step :: Real, config :: RadialConfiguration; dim = 1 :: Integer )
+function characterize(start :: Real, stop :: Real, step :: Real, config :: RadialCharacteristics; dim = 1 :: Integer )
     
     if dim < 1 || dim > 3
         error("Variable dim=$(dim) has to be 1, 2 or 3!")
@@ -171,7 +161,7 @@ end
 
 
 """
-    characterize(start :: Real, stop :: Real, step :: Real, config :: RadialConfiguration; dim = 1 :: Integer )
+    characterize(start :: Real, stop :: Real, step :: Real, config :: RadialCharacteristics; dim = 1 :: Integer )
 
 x₁ ∪ x₂ dim = {1,2}
 
@@ -179,7 +169,7 @@ x₁ ∪ x₃: dim = {1,3}
 
 x₂ ∪ x₃: dim = {2,3}
 """
-function characterize(start :: Tuple{T,T}, stop :: Tuple{T,T}, step :: Tuple{T,T}, config :: RadialConfiguration; dim = (1,2) :: Tuple{Integer,Integer}) where {T <: Real}
+function characterize(start :: Tuple{T,T}, stop :: Tuple{T,T}, step :: Tuple{T,T}, config :: RadialCharacteristics; dim = (1,2) :: Tuple{Integer,Integer}) where {T <: Real}
     if dim[1]==dim[2] || dim[1]*dim[2] < 1 || dim[1] > 3 || dim[2] > 3
         error("Variable dim=$(dim) has to be {1,2}, {1,3} or {2,3}!")
     end

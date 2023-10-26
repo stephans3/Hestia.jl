@@ -3,7 +3,7 @@ abstract type  AbstractIOSetup end
 mutable struct IOSetup <: AbstractIOSetup
     identifier :: Dict{Symbol, Vector{Int64}}     # Identifier
     indices :: Dict{Symbol, Vector{Int64}}   # Cell indices
-    character :: Dict{Symbol, Vector{Real}}    # Configuration / characterization
+    character :: Dict{Symbol, Vector{Real}}    # Characteristics 
 end
 
 """
@@ -44,11 +44,11 @@ function setIOSetup!(iosetup :: IOSetup, heatrod :: HeatRod, identifier_index ::
 end
 
 
-function setIOSetup!(iosetup :: IOSetup, heatplate :: HeatPlate, num_partitions :: Integer, config :: RadialConfiguration,  orientation :: Symbol; start_index = 1 :: Integer)
+function setIOSetup!(iosetup :: IOSetup, heatplate :: HeatPlate, num_partitions :: Integer, config :: RadialCharacteristics,  orientation :: Symbol; start_index = 1 :: Integer)
     
     partition_array = collect(start_index: 1: num_partitions+start_index-1)
     
-    config_array = RadialConfiguration[]
+    config_array = RadialCharacteristics[]
 
     for i = 1 : num_partitions
         config_array = vcat(config_array, config)
@@ -57,10 +57,10 @@ function setIOSetup!(iosetup :: IOSetup, heatplate :: HeatPlate, num_partitions 
     setIOSetup!(iosetup , heatplate, partition_array, config_array,  orientation)
 end
 
-function setIOSetup!(iosetup :: IOSetup, heatplate :: HeatPlate, partition :: Vector{T} where T <: Integer, config :: Array{RadialConfiguration,1},  orientation :: Symbol)
+function setIOSetup!(iosetup :: IOSetup, heatplate :: HeatPlate, partition :: Vector{T} where T <: Integer, config :: Array{RadialCharacteristics,1},  orientation :: Symbol)
     
     if size(partition) != size(config)
-        error("Size of partition and configuration array have to be equal!")
+        error("Size of partition and characteristics array have to be equal!")
     end
 
     if orientation == :south || orientation == :north
@@ -80,7 +80,7 @@ function setIOSetup!(iosetup :: IOSetup, heatplate :: HeatPlate, partition :: Ve
     centralpoints = findcenterpoints(heatplate, num_partitions, orientation) 
 
     if length(cellindices) < num_partitions 
-        error("Number of partitions higher than number of cells! Partitions: $(num_partitions), Cells: $(length(cellindices)). \n You may change the size of partition and configuration array.")    
+        error("Number of partitions higher than number of cells! Partitions: $(num_partitions), Cells: $(length(cellindices)). \n You may change the size of partition and characteristics array.")    
     end
 
     partitionrange = length(cellindices)/num_partitions;
@@ -124,11 +124,11 @@ end
 
 
 # HeatCuboid
-function setIOSetup!(iosetup :: IOSetup, heatcuboid :: HeatCuboid, num_partitions ::  Tuple{T,T} , config :: RadialConfiguration,  orientation :: Symbol; start_index = 1 :: Integer) where T <: Integer
+function setIOSetup!(iosetup :: IOSetup, heatcuboid :: HeatCuboid, num_partitions ::  Tuple{T,T} , config :: RadialCharacteristics,  orientation :: Symbol; start_index = 1 :: Integer) where T <: Integer
     
     num_actuators_row, num_actuators_col = num_partitions
 
-    config_array    = Array{RadialConfiguration}(undef,num_actuators_row, num_actuators_col)
+    config_array    = Array{RadialCharacteristics}(undef,num_actuators_row, num_actuators_col)
     partition_array = zeros(Integer,num_actuators_row, num_actuators_col)
     
     for iy = 1 : num_actuators_col
@@ -144,14 +144,14 @@ end
 
 
 # HeatCuboid
-function setIOSetup!(iosetup :: IOSetup, heatcuboid :: HeatCuboid, partition :: Array{T,2} where T <: Integer, config :: Array{RadialConfiguration,2},  orientation :: Symbol)
+function setIOSetup!(iosetup :: IOSetup, heatcuboid :: HeatCuboid, partition :: Array{T,2} where T <: Integer, config :: Array{RadialCharacteristics,2},  orientation :: Symbol)
     
 
     step = zeros(2)
     distance = zeros(2)
    
     if size(partition) != size(config)
-        error("Size of partition and configuration array have to be equal!")
+        error("Size of partition and characteristics array have to be equal!")
     end
 
     if orientation == :south || orientation == :north
@@ -190,9 +190,9 @@ function setIOSetup!(iosetup :: IOSetup, heatcuboid :: HeatCuboid, partition :: 
     num_cells_col = num_boundarycells[2]
 
     if num_cells_row < num_parts_rows 
-        error("Number of row partitions higher than number of row cells! Partitions: $(num_parts_rows), Cells: $(num_cells_row). \n You may change the size of partition and configuration array.")
+        error("Number of row partitions higher than number of row cells! Partitions: $(num_parts_rows), Cells: $(num_cells_row). \n You may change the size of partition and characteristics array.")
     elseif num_cells_col < num_parts_cols
-        error("Number of column partitions higher than number of column cells! Partitions: $(num_parts_cols), Cells: $(num_cells_col). \n You may change the size of partition and configuration array.")
+        error("Number of column partitions higher than number of column cells! Partitions: $(num_parts_cols), Cells: $(num_cells_col). \n You may change the size of partition and characteristics array.")
     end
 
     cellindices = getindices(heatcuboid, cellPosition = orientation) 
@@ -443,6 +443,24 @@ function getSensing(sensor :: IOSetup, ioindex :: Int64, orientation :: Symbol)
     cellindices = sensor.indices[orientation][ioindices]
     character   = sensor.character[orientation][ioindices]
     return (cellindices,character)
+end
+
+"""
+    getCharacteristics(iosetup :: IOSetup, orientation :: Symbol)
+
+Returns the characteristics and the identifier of each actuator or sensor for a certain IOSetup and boundary side.
+"""
+function getCharacteristics(iosetup :: IOSetup, orientation :: Symbol)
+    ids_io = iosetup.identifier[orientation]
+    chr_io = iosetup.character[orientation]
+    num_io = unique(ids_io)
+    indices_io = map(n -> findall(ids_io .== n), num_io)
+    charac = zeros(length(ids_io), length(num_io))
+    
+    for (id, el) in enumerate(num_io)
+        charac[indices_io[id],id] = chr_io[indices_io[id]]
+    end
+    return charac, num_io
 end
 
 

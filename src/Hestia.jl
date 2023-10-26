@@ -34,12 +34,12 @@ include("core/boundary.jl")
 
 
 #### Interface #####
-export RadialConfiguration
-export initConfiguration, setConfiguration, characterize
+export RadialCharacteristics
+export characterize
 include("interface/characterization.jl")
 
 export IOSetup
-export IOSetup, setIOSetup!, getActuation, getSensing, measure
+export IOSetup, setIOSetup!, getActuation, getSensing, measure, getCharacteristics
 export checkIOSetup2D
 include("interface/iosetup.jl")
 

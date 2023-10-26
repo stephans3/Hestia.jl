@@ -29,7 +29,7 @@ All used values are listed in the table below.
 | Spatial characterization  | $b$           | 1     |
 
 
-## 1. Material Properties and Geometry
+## Material Properties and Geometry
 In the first step we define the material properties and the geometry. As stated in the beginning we assume *isotropic*, temperature-*independent* material properties and thus we create a `StaticIsotropic`. Next, we create the geometry: here the one-dimensional rod `HeatRod`.
 
 ```@example 1D_rod
@@ -46,8 +46,8 @@ Nx = 40     # Number of elements: x direction
 heatrod  = HeatRod(L, Nx)
 ```
 
-## 2. Emission
-Now, we define the emitted heat flux on the right boundary side ($x=L$). On the right boundary side we assume linear heat transfer (convection) and nonlinear heat radiation with emissivity $\epsilon=0.2$. 
+## Emission
+Now, we define the emitted heat flux on the right boundary side ($x=L$). On the right boundary side we assume linear heat transfer (convection) and nonlinear heat radiation with emissivity $\epsilon=0.2$. The constructor of `Emission` expects the heat transfer coefficient and the emissivity; the heat radiation coefficient is computed internally using the Stefan-Boltzmann constant. 
 
 ```@example 1D_rod
 h = 5;   # Heat transfer coefficient
@@ -62,7 +62,7 @@ boundary  = Boundary(heatrod)
 setEmission!(boundary, emission, :east)
 ```
 
-## 3. Actuation
+## Actuation
 Before we define the actuation we initialize the `IOSetup` which is a container for actuator and sensor setups.
 
 ```@example 1D_rod
@@ -77,7 +77,7 @@ pos_actuators = :west # Position of actuators
 setIOSetup!(rod_actuation, heatrod, input_id, scale,  pos_actuators)
 ```
 
-## 4. Simulation
+## Simulation
 
 The simulation is built as explained in the [DifferentialEquations.jl documentation](https://diffeq.sciml.ai/stable/). We define the differential equation interface `heat_conduction!(dθ, θ, param, t)` with temperature `θ` and use method `diffusion!` to simulate the diffusion. We assume a constant input $u(t) = 4 \cdot 10^5$. Only vector-valued input signals are supported and so it is multiplied with `ones(1)`.
 

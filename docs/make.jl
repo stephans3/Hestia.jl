@@ -17,8 +17,8 @@ makedocs(;
        "Hestia.jl" => "index.md",
        "Getting Started" => "getting_started.md",
        "Tutorials" => Any[
-         "examples/rod_1d.md",
-         "examples/plate_2d.md"
+         "tutorials/rod_1d.md",
+         "tutorials/plate_2d.md"
         ], 
         "Theory" => Any[
          "theory/geometry_boundary.md",
@@ -30,7 +30,7 @@ makedocs(;
     ],
 )
 
-
+#=
 deploydocs(;
     repo="github.com/stephans3/Hestia.jl.git",
-)
+)=#

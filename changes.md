@@ -1,3 +1,13 @@
+# 2023 / 10 / 25
+## characterization.jl
+- Rename Configuration -> Characteristics
+- Change constructuro initConfiguration -> RadialCharacteristics
+
+# iosetup.jl
+- Add function getCharacteristics
+
+
+
 # 2023 / 10 / 24
 ## emission.jl
 - Remove old constructor

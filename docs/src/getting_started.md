@@ -98,4 +98,4 @@ plot!(xgrid, sol[:,end], label="Final")
 
 ## What is next?
 
-Hestia is designed to simulate boundary controlled heat conduction phenomena in multiple dimensions (1D, 2D, 3D). On page [One-dimensional rod](examples/rod_1d.md) you will learn how to simulate 1D heat conduction including a heat supply on the left boundary side. On page [Two-dimensional plate](examples/plate_2d.md) we model quasi-linear heat conduction in a rectangle, in which the material properties depend on the temperature. 
+Hestia is designed to simulate boundary controlled heat conduction phenomena in multiple dimensions (1D, 2D, 3D). On page [One-dimensional rod](tutorials/rod_1d.md) you will learn how to simulate 1D heat conduction including a heat supply on the left boundary side. On page [Two-dimensional plate](tutorials/plate_2d.md) we model quasi-linear heat conduction in a rectangle, in which the material properties depend on the temperature. 
