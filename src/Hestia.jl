@@ -43,11 +43,6 @@ export IOSetup, setIOSetup!, getActuation, getSensing, measure, getCharacteristi
 export checkIOSetup2D
 include("interface/iosetup.jl")
 
-# 
-#export induce!
-# export HeatRodActuation, HeatPlateActuation, HeatCuboidActuation
-# export initActuation, getActuation, setActuation!, checkActuation2D
-# include("interface/actuators.jl")
 
 # Core
 export CubicHeatProblem
