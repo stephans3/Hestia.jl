@@ -161,6 +161,8 @@ act_char, _ = getCharacteristics(actuation, pos_actuators)
 scatter(xgrid, act_char, xlabel="Length L", ylabel="Spatial Characteristics",label=["Actuator 1" "Actuator 2" "Actuator 3"], legend=:bottomright, linewidth=3)
 ```
 
+<img src="https://raw.githubusercontent.com/stephans3/Hestia.jl/master/docs/assets/spatial_characteristics.png" width="600" height="400" />
+
 The evolution of the temperature is expressed by an animation.
 ```julia
 anim = @animate for i in axes(sol,2)
@@ -168,3 +170,5 @@ anim = @animate for i in axes(sol,2)
 end
 gif(anim, "plate_2d_animation.gif", fps=10)
 ```
+
+<img src="https://raw.githubusercontent.com/stephans3/Hestia.jl/master/docs/assets/plate_2d_animation.gif" width="600" height="400" />

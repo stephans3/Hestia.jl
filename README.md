@@ -38,6 +38,17 @@ The documentation will be updated soon.
 
 For examples are listed in folder [**examples**](https://github.com/stephans3/Hestia.jl/tree/master/examples).
 
+## Tutorials and Examples 
+
+Tutorials can be found in the [docs](https://stephans3.github.io/Hestia.jl/dev).
+
+You are interest in more examples?
+Come and visit our HestiaModelZoo!
+
+
+<img src="https://raw.githubusercontent.com/stephans3/Hestia.jl/master/docs/assets/plate_2d_animation.gif" width="450" height="300">
+
+
 ## Alternatives
 If you look for general purpose approaches to simulate heat conduction, you may also take a look on
 - [Trixi.jl](https://github.com/trixi-framework/Trixi.jl/)
@@ -45,27 +56,6 @@ If you look for general purpose approaches to simulate heat conduction, you may 
 - [VoronoiFVM.jl](https://github.com/j-fu/VoronoiFVM.jl)
 
 
-## Cooling-down processes: no actuation
-
-- [**1D** with constant properties](https://github.com/stephans3/Hestia.jl/blob/master/examples/cooling_down/1D/rod_iso_static_cool.jl): linear heat conduction
-- [**1D** with temperature-dependent properties](https://github.com/stephans3/Hestia.jl/blob/master/examples/cooling_down/1D/rod_iso_dynamic_cool.jl): quasi-linear heat conduction
-- [**2D** with constant properties](https://github.com/stephans3/Hestia.jl/blob/master/examples/cooling_down/2D/plate_iso_static_cool.jl) 
-- [**2D** with temperature-dependent properties](https://github.com/stephans3/Hestia.jl/blob/master/examples/cooling_down/2D/plate_iso_dynamic_cool.jl)
-- [**3D** with constant properties](https://github.com/stephans3/Hestia.jl/blob/master/examples/cooling_down/3D/cuboid_iso_static_cool.jl)
-- [**3D** with temperature-dependent properties](https://github.com/stephans3/Hestia.jl/blob/master/examples/cooling_down/3D/cuboid_iso_dynamic_cool.jl)
-
-
-## Heating-up processes: with actuation
-
-- [**1D** with constant properties](https://github.com/stephans3/Hestia.jl/blob/master/examples/heating_up/1D/rod_iso_static_heat.jl): linear heat conduction
-- [**1D** with temperature-dependent properties](https://github.com/stephans3/Hestia.jl/blob/master/examples/heating_up/1D/rod_iso_dynamic_heat.jl): quasi-linear heat conduction
-- [**2D** with constant properties (basic 1)](https://github.com/stephans3/Hestia.jl/blob/master/examples/heating_up/2D/plate_iso_static_heat_a1.jl) 
-- [**2D** with constant properties (basic 2)](https://github.com/stephans3/Hestia.jl/blob/master/examples/heating_up/2D/plate_iso_static_heat_a2.jl) 
-- [**2D** with constant properties (advanced 2)](https://github.com/stephans3/Hestia.jl/blob/master/examples/heating_up/2D/plate_iso_static_heat_b1.jl)
-- [**2D** with constant properties (advanced 2)](https://github.com/stephans3/Hestia.jl/blob/master/examples/heating_up/2D/plate_iso_static_heat_b2.jl)
-- [**2D** with temperature-dependent properties](https://github.com/stephans3/Hestia.jl/blob/master/examples/heating_up/2D/plate_iso_dynamic_heat.jl)
-- [**3D** with constant properties](https://github.com/stephans3/Hestia.jl/blob/master/examples/heating_up/3D/cuboid_iso_static_heat.jl)
-- [**3D** with temperature-dependent properties](https://github.com/stephans3/Hestia.jl/blob/master/examples/heating_up/3D/cuboid_iso_dynamic_heat.jl)
 
 
 # How to cite

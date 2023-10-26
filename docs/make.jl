@@ -30,7 +30,6 @@ makedocs(;
     ],
 )
 
-#=
 deploydocs(;
     repo="github.com/stephans3/Hestia.jl.git",
-)=#
+)
