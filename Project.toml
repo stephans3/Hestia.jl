@@ -1,7 +1,7 @@
 name = "Hestia"
 uuid = "75036a29-a2ca-4eb4-a964-4c35e636f9a9"
 authors = ["Stephan Scholz <stephan.scholz@rwu.de> and contributors"]
-version = "0.3.0"
+version = "0.3.1"
 
 [deps]
 JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
@@ -9,6 +9,7 @@ JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
 [compat]
 julia = "1.6"
 JuliaFormatter = "1"
+
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 

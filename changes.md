@@ -1,3 +1,22 @@
+# 2024 / 01 / 31
+- Change to Julia version 1.10.0
+- Update Pkg
+
+## emission.jl
+- Change type Emission: stores emissivity values, external temperature
+- Add 2 constructors for type Emission
+- Change method emit and emit!
+
+## properties.jl
+- Extend docs in StaticAnisotropic and DynamicAnisotropic
+
+## rod_1d.jl
+- Change init of Emission 
+- minor bug fix in heat_conduction_controlled!
+
+## plate_2d.jl
+- Change init of Emission 
+
 # 2023 / 10 / 25
 ## characterization.jl
 - Rename Configuration -> Characteristics

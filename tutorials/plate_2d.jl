@@ -15,7 +15,7 @@ plate = HeatPlate(L, W, Nx, Ny)
 h = 5.0       # Heat transfer coefficient
 ϵ = 0.3       # Emissivity
 θamb = 300.0; # Ambient temperature
-emission = Emission(h, ϵ, θamb)   # Convection and Radiation
+emission = Emission(h, θamb, ϵ)   # Convection and Radiation
 
 # Boundary Conditions
 boundary  = Boundary(plate)

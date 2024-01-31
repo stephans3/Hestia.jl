@@ -47,13 +47,17 @@ heatrod  = HeatRod(L, Nx)
 ```
 
 ## Emission
-Now, we define the emitted heat flux on the right boundary side ($x=L$). On the right boundary side we assume linear heat transfer (convection) and nonlinear heat radiation with emissivity $\epsilon=0.2$. The constructor of `Emission` expects the heat transfer coefficient and the emissivity; the heat radiation coefficient is computed internally using the Stefan-Boltzmann constant. 
+Now, we define the emitted heat flux on the right boundary side ($x=L$). On the right boundary side we assume linear heat transfer (convection) and nonlinear heat radiation with emissivity $\epsilon=0.2$ as in
+```math
+\lambda ~ \frac{d}{dx} \theta(t,x) = -h [\theta(t,x) - \theta_{amb}] - \sigma~\varepsilon_{1}~\theta(t,x).
+```
+The constructor of `Emission` expects the heat transfer coefficient, the ambient temperature and the emissivity. 
 
 ```@example 1D_rod
 h = 5;   # Heat transfer coefficient
 ϵ = 0.2; # Emissivity
 θamb = 300; # Ambient temperature
-emission = Emission(h, ϵ, θamb) 
+emission = Emission(h, θamb, ϵ)
 ```
 Next, this emission has to be assigned for the right boundary side, which is specified as `:east`. To do so, we initialize the boundary with `Boundary()` to yield a container which stores all emissions for each boundary.
 
@@ -143,7 +147,7 @@ In the differential equations interface we use the `controller()` method to calc
 ```@example 1D_rod
 function heat_conduction_controlled!(dθ, θ, param, t)
     u_in = controller(Θref, θ[end]) * ones(1)    # heat input
-    diffusion!(dθ, θ, heatrod, property, boundary_rod, rod_actuation, u_in)
+    diffusion!(dθ, θ, heatrod, property, boundary, rod_actuation, u_in)
 end
 ```
 
@@ -174,7 +178,7 @@ heatrod  = HeatRod(L, Nx)
 h = 5.0 # Heat transfer coefficient
 ϵ = 0.2 # Heat radiation coefficient
 θamb = 300; # Ambient temperature
-emission = Emission(h, ϵ, θamb)   # Convection and radiation
+emission = Emission(h, θamb, ϵ)   # Convection and radiation
 boundary = Boundary(heatrod)
 setEmission!(boundary, emission, :east)
 
@@ -222,7 +226,7 @@ controller(ref, yout) = Kp*max((ref-yout),0) # Proportional controller
 
 function heat_conduction_controlled!(dθ, θ, param, t)
     u_in = controller(Θref, θ[end]) * ones(1)    # heat input
-    diffusion!(dθ, θ, heatrod, property, boundary_rod, rod_actuation, u_in)
+   diffusion!(dθ, θ, heatrod, property, boundary, rod_actuation, u_in)
 end
 
 tspan_cntr = (0.0, 3500.0)

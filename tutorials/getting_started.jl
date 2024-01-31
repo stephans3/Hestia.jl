@@ -14,7 +14,7 @@ rod  = HeatRod(L, Nx)
 ### Boundaries ###
 h = 10;
 θamb = 300;
-emission = Emission(h, 0, θamb)   # Only convection
+emission = Emission(h, θamb)   # Only convection
 boundary = Boundary(rod)
 setEmission!(boundary, emission, :east)
 
@@ -34,5 +34,5 @@ sol = solve(prob,alg, saveat=1.0)
 
 using Plots
 xgrid = L*(Ngrid.-0.5)/Nx
-plot(xgrid, sol[:,1], title="Simulation of 1D heat conduction",xlabel="Length L in [m]", ylabel="Temperature in [K]", label="Initial")
-plot!(xgrid, sol[:,end], label="Final")
+plot(xgrid, sol[:,1], linewidth=2, title="Simulation of 1D heat conduction",xlabel="Length L in [m]", ylabel="Temperature in [K]", label="Initial")
+plot!(xgrid, sol[:,end], linewidth=2, ls=:dash, label="Final")

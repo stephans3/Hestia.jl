@@ -81,7 +81,7 @@ Next, we define the emitted heat flux on the boundary sides `:west`, `:east` and
 h = 5.0       # Heat transfer coefficient
 ϵ = 0.3       # Emissivity
 θamb = 300.0; # Ambient temperature
-emission  = Emission(h, ϵ, θamb)   # Convection and Radiation
+emission  = Emission(h, θamb, ϵ)   # Convection and Radiation
 ```
 The emission has to be assigned for all boundary sides. We initialize the boundary with `Boundary()` to yield a container which stores all emissions and set the emissions. The emission at boundary `:south` is initiallized automatically as zero-Neumann boundary condition (thermal insulation) because only heat supply is modelled on this boundary side.
 

@@ -56,7 +56,7 @@ with `h` as heat transfer paramter and $\theta_{amb}$ as ambient temperature. We
 ```@example getting_started_1D
 h = 10;
 θamb = 300;
-emission = Emission(h, 0, θamb)   # Only convection
+emission = Emission(h,θamb)   # Only convection
 boundary = Boundary(rod)
 setEmission!(boundary, emission, :east); 
 ```
@@ -92,8 +92,8 @@ Finally, we plot our results with `Plots.jl` and compare the initial temperature
 ```
 using Plots
 xgrid = L*(Ngrid.-0.5)/Nx
-plot(xgrid, sol[:,1], title="Simulation of 1D heat conduction",xlabel="Length L in [m]", ylabel="Temperature in [K]", label="Initial")
-plot!(xgrid, sol[:,end], label="Final")
+plot(xgrid, sol[:,1], linewidth=2, title="Simulation of 1D heat conduction",xlabel="Length L in [m]", ylabel="Temperature in [K]", label="Initial")
+plot!(xgrid, sol[:,end], linewidth=2, ls=:dash, label="Final")
 ```
 
 ## What is next?

@@ -7,8 +7,6 @@ abstract type AbstractAnisotropicProperty <: AbstractMaterialProperty end
 
 # HeatProperty
 
-# TODO: treat dynamic and anisotropic cases
-
 #############################################################
 
 
@@ -54,13 +52,14 @@ end
 """
     specifyproperty(θ :: Real, c :: Vector{<: Real})
 
-    - Temperature: `θ`
-    - Coefficients: `c`
+- Temperature: `θ`
+- Coefficients: `c`
 
-    Computes     
+Computes
+```math
+    \\sum_{n=1}^{N} c_{n} \\theta^{n-1}
+```        
 """
-
-# \sum_{n=1}^{N} c_{n} \theta^{n-1}
 function specifyproperty(θ :: Real, c :: Vector{<: Real})
     N = length(c)
     return mapreduce(n -> c[n]*θ^(n-1), + ,1:N)
@@ -68,8 +67,25 @@ end
 
 
 """
-Static anisotropic properties
-λ = diag(λx, λy, λz) = [λx 0 0; 0 λy 0 ; 0 0 λz]
+    StaticAnisotropic <: AbstractAnisotropicProperty
+
+Type StaticAnisotropic contains the coefficients for anisotropic and temperature-independent (static) heat conduction
+    
+```math
+    \\lambda = diag(\\lambda_{x},\\lambda_{y},\\lambda_{z})
+```    
+
+### Elements
+
+`λx` : x-axis: thermal conductivity  
+
+`λy` : y-axis: thermal conductivity 
+
+`λz` : z-axis: thermal conductivity 
+
+`ρ` : Mass density
+
+`c` : Specific heat capacity 
 """
 mutable struct StaticAnisotropic <: AbstractAnisotropicProperty
     λx :: Real # Thermal conductivity in x-direction
@@ -91,7 +107,28 @@ end
 
 
 
+"""
+    DynamicAnisotropic <: AbstractAnisotropicProperty
 
+Type DynamicAnisotropic contains the coefficients for anisotropic and temperature-dependent (dynamic) heat conduction
+    
+```math
+    \\lambda(\\theta) = diag(\\lambda_{x}(\\theta),\\lambda_{y}(\\theta),\\lambda_{z}(\\theta))
+```    
+
+### Elements
+
+`λx` : x-axis: thermal conductivity coefficients 
+
+`λy` : y-axis: thermal conductivity coefficients
+
+`λz` : z-axis: thermal conductivity coefficients
+
+`ρ` : Mass density coefficients
+
+`c` : Specific heat capacity coefficients
+
+"""
 mutable struct DynamicAnisotropic <: AbstractAnisotropicProperty
     λx :: Vector{Real} # Thermal conductivity in x-direction
     λy :: Vector{Real} # Thermal conductivity in y-direction
@@ -103,7 +140,10 @@ end
 
 
 """
-createDynamicAnisotropic(conductivity_x :: Vector{T}, conductivity_y :: Vector{T}, conductivity_z :: Vector{T},  density :: Vector{T}, capacity :: Vector{T}) where T <: Real
+DynamicAnisotropic(λx :: Vector{<:Real}, 
+                    λy :: Vector{<:Real},                                 
+                    ρ :: Vector{<:Real},
+                    c :: Vector{<:Real})
 
 Returns a DynamicAnisotropic    
 """
@@ -113,18 +153,3 @@ function DynamicAnisotropic(λx :: Vector{<:Real},
     c :: Vector{<:Real})
     return DynamicAnisotropic(λx, λy, [0], ρ, c)
 end
-
-
-
-
-
-
-
-
-
-#### OLD CODE BELOW
-
-
-
-
-

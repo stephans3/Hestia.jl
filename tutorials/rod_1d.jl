@@ -13,7 +13,8 @@ heatrod  = HeatRod(L, Nx)
 h = 5.0 # Heat transfer coefficient
 ϵ = 0.2 # Heat radiation coefficient
 θamb = 300; # Ambient temperature
-emission = Emission(h, ϵ, θamb)   # Convection and radiation
+
+emission = Emission(h, θamb, ϵ)   # Convection and radiation
 boundary = Boundary(heatrod)
 setEmission!(boundary, emission, :east )
 
@@ -64,7 +65,7 @@ controller(ref, yout) = Kp*max((ref-yout),0) # Proportional controller
 
 function heat_conduction_controlled!(dθ, θ, param, t)
     u_in = controller(Θref, θ[end]) * ones(1)    # heat input
-    diffusion!(dθ, θ, heatrod, property, boundary_rod, rod_actuation, u_in)
+    diffusion!(dθ, θ, heatrod, property, boundary, rod_actuation, u_in)
 end
 
 tspan_cntr = (0.0, 3500.0)
