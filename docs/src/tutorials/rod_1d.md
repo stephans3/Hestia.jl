@@ -12,7 +12,10 @@ in which parameter `b` scales the input signal `u`. On the right boundary side `
 
 $\lambda \frac{\partial \theta(t,x)}{\partial x} = -h (\theta(t,x) - \theta_{amb}) - k (\theta(t,x)^4 - \theta_{amb}^4)$
 
-with heat transfer coefficient `h` and heat radiation coefficient `k`. The heat radiation coefficient consist of emissivity `ϵ` and Stefan-Boltzmann constant $\sigma \approx 5.67 \cdot 10^{-8} \frac{W}{m^2 K^4}$ as $k=\epsilon ~ \sigma$. In the source code we do not define `k` but emissivity `ϵ`. We assume an initial and ambient temperature of $300$ Kelvin. 
+$\lambda ~ \frac{d}{dx} \theta(t,x) = -h ~ [\theta(t,x) - \theta_{amb}] - \sigma~\varepsilon_{1}~\theta(t,x)^4$
+
+
+with heat transfer coefficient `h`, emissivity `ε₁` and Stefan-Boltzmann constant $\sigma \approx 5.67 \cdot 10^{-8} \frac{W}{m^2 K^4}$. We assume an initial and ambient temperature of $300$ Kelvin. 
 
 All used values are listed in the table below.
 
@@ -47,10 +50,8 @@ heatrod  = HeatRod(L, Nx)
 ```
 
 ## Emission
-Now, we define the emitted heat flux on the right boundary side ($x=L$). On the right boundary side we assume linear heat transfer (convection) and nonlinear heat radiation with emissivity $\epsilon=0.2$ as in
-```math
-\lambda ~ \frac{d}{dx} \theta(t,x) = -h [\theta(t,x) - \theta_{amb}] - \sigma~\varepsilon_{1}~\theta(t,x).
-```
+Now, we define the emitted heat flux on the right boundary side ($x=L$). On the right boundary side we assume linear heat transfer (convection) and nonlinear heat radiation with emissivity $\epsilon=0.2$.
+
 The constructor of `Emission` expects the heat transfer coefficient, the ambient temperature and the emissivity. 
 
 ```@example 1D_rod

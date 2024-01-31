@@ -13,9 +13,12 @@ plate = HeatPlate(L, W, Nx, Ny)
 
 # Emission
 h = 5.0       # Heat transfer coefficient
-ϵ = 0.3       # Emissivity
 θamb = 300.0; # Ambient temperature
-emission = Emission(h, θamb, ϵ)   # Convection and Radiation
+ϵ = 0.3       # Emissivity
+ε₁ = 0.3      # Emissivity of main object
+ε₂ = 0.1      # Emissivity of external body
+θext = 300.0; # External temperature
+emission  = Emission(h, θamb, ε₁, ε₂, θext)   # Convection and Radiation
 
 # Boundary Conditions
 boundary  = Boundary(plate)

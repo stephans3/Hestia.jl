@@ -17,17 +17,16 @@ $-\lambda \frac{\partial \theta(t,x,y)}{\partial y} = b_{1}(x,y) ~ u_{1}(t) + b_
 
 as actuation on boundary `:south` at $y=0$ and emissions
 
-$-\lambda \frac{\partial \theta(t,x,y)}{\partial x} = -h (\theta(t,x,y) - \theta_{amb}) - \epsilon \sigma (\theta(t,x,y)^4 - \theta_{amb}^4)$
+$-\lambda \frac{\partial \theta(t,x,y)}{\partial x} = -h (\theta(t,x,y) - \theta_{amb}) - \sigma ~ [\varepsilon_{1} ~ \theta(t,x,y)^4 - \varepsilon_{2} ~ \theta_{ext}^4]$
 
 on boundary `:west` at $x=0$
 
-$\lambda \frac{\partial \theta(t,x,y)}{\partial x} = -h (\theta(t,x,y) - \theta_{amb}) - \epsilon \sigma (\theta(t,x,y)^4 - \theta_{amb}^4)$
-
+$\lambda \frac{\partial \theta(t,x,y)}{\partial x} = -h (\theta(t,x,y) - \theta_{amb}) - \sigma ~ [\varepsilon_{1} ~ \theta(t,x,y)^4 - \varepsilon_{2} ~ \theta_{ext}^4]$
 on boundary `:east` at $x=L$ and 
 
-$\lambda \frac{\partial \theta(t,x,y)}{\partial y} = -h (\theta(t,x,y) - \theta_{amb}) - k (\theta(t,x,y)^4 - \theta_{amb}^4)$
+$\lambda \frac{\partial \theta(t,x,y)}{\partial y} = -h (\theta(t,x,y) - \theta_{amb}) - \sigma ~ [\varepsilon_{1} ~ \theta(t,x,y)^4 - \varepsilon_{2} ~ \theta_{ext}^4]$
 
-on boundary `:north` at $y=W$. The ambient temperature $\theta_{amb}$, the heat transfer coefficient $h$ and0 the heat radiation coefficient $k = \epsilon ~ \sigma$ with emissivity $\epsilon$  and Stefan-Boltzmann constant $\sigma \approx 5.67 \cdot 10^{-8} \frac{W}{m^2 K^4}$ are assumed to be equal for each boundary side. 
+on boundary `:north` at $y=W$. The ambient temperature $\theta_{amb}$ Kelvin, the heat transfer coefficient $h$, and the heat radiation with emissivity values $\varepsilon_{1}$ $\varepsilon_{2}$ and the temperature of an external body $\theta_{ext}$ are assumed to be equal for each boundary side. The Stefan-Boltzmann constant is $\sigma \approx 5.67 \cdot 10^{-8} \frac{W}{m^2 K^4}$.
 
 We assume an initial and ambient temperature of $300$ Kelvin. 
 
@@ -43,8 +42,10 @@ All used values are listed in the table below.
 | Thermal conductivity      | $\lambda$     |  $20 + 0.1 \theta$  |
 | Specific heat capacity    | $c$           | $220 + 0.6 \theta$  |
 | Heat transfer coefficient | $h$           | 5     |
-| Emissivity                | $\epsilon$    | 0.3   |
+| Emissivity                | $\varepsilon_{1}$    | 0.3   |
+| Emissivity                | $\varepsilon_{2}$    | 0.1   |
 | Ambient temperature       | $\theta_{amb}$| 300   |
+| Temperature of external body       | $\theta_{ext}$| 300   |
 
 ## Material Properties and Geometry
 In the first step we define the material properties and the geometry. As stated in the beginning we assume *isotropic*, temperature-*dependent* thermal conductivity
@@ -79,9 +80,12 @@ Next, we define the emitted heat flux on the boundary sides `:west`, `:east` and
 
 ```@example 2d_plate
 h = 5.0       # Heat transfer coefficient
-ϵ = 0.3       # Emissivity
 θamb = 300.0; # Ambient temperature
-emission  = Emission(h, θamb, ϵ)   # Convection and Radiation
+ϵ = 0.3       # Emissivity
+ε₁ = 0.3      # Emissivity of main object
+ε₂ = 0.1      # Emissivity of external body
+θext = 300.0; # External temperature
+emission  = Emission(h, θamb, ε₁, ε₂, θext)   # Convection and Radiation
 ```
 The emission has to be assigned for all boundary sides. We initialize the boundary with `Boundary()` to yield a container which stores all emissions and set the emissions. The emission at boundary `:south` is initiallized automatically as zero-Neumann boundary condition (thermal insulation) because only heat supply is modelled on this boundary side.
 
